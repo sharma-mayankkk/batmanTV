@@ -1,11 +1,10 @@
 import { v2 as cloudinary } from "cloudinary"
 import fs from 'fs'
 
-
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: CLOUDINARY_API_KEY,
-    api_secret: CLOUDINARY_API_SECRET
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
@@ -22,9 +21,5 @@ const uploadOnCloudinary = async (localFilePath) => {
         return null
     }
 }
-
-cloudinary.uploader.upload('https://i1-e.pinimg.com/1200x/3c/2a/e7/3c2ae7d209bcf3bf88f7d4fbbf7b35e0.jpg',
-    { public_id: 'batman' },
-    function (err, result) { console.log(result) })
 
 export { uploadOnCloudinary } 
