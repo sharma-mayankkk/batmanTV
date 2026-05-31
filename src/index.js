@@ -20,10 +20,6 @@ connectDb()
 
 
 
-
-
-
-
 //first approach:
 /*
 import express from "express"
