@@ -32,8 +32,16 @@ const userSchema = new Schema({
         required: true,
     },
 
+    avatarPublicId: {
+        type: String,
+    },
+
     coverImage: {
         type: String,
+    },
+
+    coverImage: {
+       type: String, 
     },
 
     watchHistory: [
@@ -57,7 +65,7 @@ const userSchema = new Schema({
 
 //middleware
 userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return;
+    if (!this.isModified("password")) return next();
 
     this.password = await bcrypt.hash(this.password, 10)
     next()
