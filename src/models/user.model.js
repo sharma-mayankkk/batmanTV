@@ -40,7 +40,7 @@ const userSchema = new Schema({
         type: String,
     },
 
-    coverImage: {
+    coverImagePublicId: {
        type: String, 
     },
 
