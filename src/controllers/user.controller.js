@@ -146,8 +146,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
             }
         },
         {
@@ -183,7 +183,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new apiError(401, "invalid refresh token")
         }
 
-        if (incomingRefreshToken != user?.refreshToken) {
+        if (incomingRefreshToken !== user?.refreshToken) {
             throw new apiError(401, "refresh token is expired or used")
         }
 
@@ -192,14 +192,18 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true
         }
 
-        const { accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user._id)
+        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user._id)
 
         return res
             .status(200)
-            .cookie("access Token", accessToken)
-            .cookie("refresh Token", newRefreshToken)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
             .json(
-                new apiResponse(200, { accessToken, newRefreshToken }, "Access token refreshed")
+                new apiResponse(200, {
+                    accessToken,
+                    refreshToken: newRefreshToken
+                },
+                    "Access token refreshed")
             )
     } catch (error) {
         throw new apiError(401, error?.message || "Invalid refresh token")
@@ -208,8 +212,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body
-    User.findById(req.user?._id)
-    await user.isPasswordCorrect(oldPassword)
+    const user = await User.findById(req.user?._id)
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
     if (!isPasswordCorrect) {
         throw new apiError(400, "Invalid old password")
@@ -226,7 +230,10 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
-        .json(200, req.user, "Current User fetched successfully")
+        .json(
+            new apiResponse(
+                200, req.user, "Current User fetched successfully"
+            ))
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -236,7 +243,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         throw new apiError(400, "All fields are required")
     }
 
-    User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
@@ -254,7 +261,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    const avatarLocalPath = req.files?.path
+    const avatarLocalPath = req.file?.path
 
     if (!avatarLocalPath) {
         throw new apiError(400, "Avatar file is missing")
@@ -290,7 +297,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 })
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
-    const coverImageLocalPath = req.files?.path
+    const coverImageLocalPath = req.file?.path
 
     if (!coverImageLocalPath) {
         throw new apiError(400, "coverImage file is missing")
