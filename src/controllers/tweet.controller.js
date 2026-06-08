@@ -3,6 +3,7 @@ import { Tweet } from "../models/tweet.model.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"
+import { User } from "../models/user.model.js"
 
 const createTweet = asyncHandler(async (req, res) => {
     const { content } = req.body
@@ -11,7 +12,7 @@ const createTweet = asyncHandler(async (req, res) => {
         throw new apiError(400, "Tweet Content is required")
     }
 
-    const tweet = Tweet.create({
+    const tweet = await Tweet.create({
         content,
         owner: req.user._id
     })
@@ -74,7 +75,7 @@ const updateTweet = asyncHandler(async (req, res) => {
     const tweet = await Tweet.findById(tweetId)
 
     if (!tweet) {
-        throw new apiError(400, "Tweet not Found")
+        throw new apiError(404, "Tweet not Found")
     }
 
     if (!tweet.owner.equals(req.user._id)) {
@@ -83,7 +84,7 @@ const updateTweet = asyncHandler(async (req, res) => {
 
     tweet.content = content
 
-    await content.save()
+    await tweet.save()
 
     return res
         .status(200)
@@ -118,9 +119,11 @@ const deleteTweet = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            200,
-            {},
-            "Tweet Deleted successfully"
+            new apiResponse(
+                200,
+                {},
+                "Tweet Deleted successfully"
+            )
         )
 
 })
