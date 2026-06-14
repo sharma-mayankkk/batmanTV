@@ -169,7 +169,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
     const thumbnailPublicId = video?.thumbnailPublicId
 
     if (videoFilePublicId) {
-        await deleteFromCloudinary(videoFilePublicId,"video")
+        await deleteFromCloudinary(videoFilePublicId, "video")
     }
 
     if (thumbnailPublicId) {
@@ -189,14 +189,134 @@ const deleteVideo = asyncHandler(async (req, res) => {
 })
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    
+    const {
+        page = 1,
+        limit = 10,
+        query,
+        sortBy = "createdAt",
+        sortType = "desc",
+        userId
+    } = req.query
+
+    const matchStage = {
+        isPublished: true
+    }
+
+    if (query) {
+        matchStage.$or = [
+            {
+                title: {
+                    $regex: query,
+                    $options: "i"
+                }
+            },
+            {
+                description: {
+                    $regex: query,
+                    $options: "i"
+                }
+            }
+        ]
+    }
+
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+        matchStage.owner = new mongoose.Types.ObjectId(userId)
+    }
+
+    const aggregate = Video.aggregate([
+        {
+            $match: matchStage
+        },
+        {
+            $sort: {
+                [sortBy]: sortType === "asc" ? 1 : -1
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails"
+            }
+        },
+        {
+            $unwind: "$ownerDetails"
+        },
+        {
+            $project: {
+                _id: 1,
+                videoFile: 1,
+                thumbnail: 1,
+                title: 1,
+                description: 1,
+                duration: 1,
+                views: 1,
+                isPublished: 1,
+                createdAt: 1,
+                updatedAt: 1,
+
+                owner: {
+                    _id: "$ownerDetails._id",
+                    username: "$ownerDetails.username",
+                    fullName: "$ownerDetails.fullName",
+                    avatar: "$ownerDetails.avatar"
+                }
+            }
+        }
+    ])
+
+    const options = {
+        page: Number(page),
+        limit: Number(limit)
+    }
+
+    const videos = await Video.aggregatePaginate(
+        aggregate,
+        options
+    )
+
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            videos,
+            "Videos fetched successfully"
+        )
+    )
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-})
 
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new apiError(400, "Invalid Video ID")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if (!video) {
+        throw new apiError(404, "Video not Found")
+    }
+
+    if (!video.owner.equals(req.user._id)) {
+        throw new apiError(403, "Unauthorized Access")
+    }
+
+    video.isPublished = !video.isPublished
+
+    await video.save()
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                video,
+                "Publish Status updated successfully"
+            )
+        )
+
+})
 
 export {
     getAllVideos,
