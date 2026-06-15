@@ -5,8 +5,11 @@ import { Video } from "../models/video.model.js"
 import { Comment } from "../models/comment.model.js"
 import { apiResponse } from "../utils/apiResponse.js";
 
-const getVideoComment = asyncHandler(async (req, res) => {
+const getVideoComments = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
 
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
         throw new apiError(400, "Invalid video Id")
@@ -18,19 +21,33 @@ const getVideoComment = asyncHandler(async (req, res) => {
         throw new apiError(404, "Video not found")
     }
 
-    const comments = await Comment.find({
-        video: videoId,
-    }).sort({ createdAt: -1 })
+    const totalComments = await Comment.countDocuments({
+        video: videoId
+    })
 
-    return res
-        .status(200)
-        .json(
-            new apiResponse(
-                200,
-                comments,
-                "Comments Fetched Successfully"
-            )
+    const comments = await Comment.find({
+        video: videoId
+    })
+        .populate(
+            "owner",
+            "username fullName avatar"
         )
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            {
+                comments,
+                totalComments,
+                currentPage: page,
+                totalPages: Math.ceil(totalComments / limit)
+            },
+            "Comments Fetched Successfully"
+        )
+    )
 })
 
 const addComment = asyncHandler(async (req, res) => {
@@ -52,7 +69,7 @@ const addComment = asyncHandler(async (req, res) => {
     }
 
     const comment = await Comment.create({
-        content,
+        content: content.trim(),
         video: videoId,
         owner: req.user._id
     })
@@ -95,7 +112,7 @@ const updateComment = asyncHandler(async (req, res) => {
         throw new apiError(403, "Unauthorized access")
     }
 
-    comment.content = content
+    comment.content = content.trim()
 
     await comment.save()
 
@@ -141,7 +158,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 })
 
 export {
-    getVideoComment,
+    getVideoComments,
     addComment,
     updateComment,
     deleteComment
