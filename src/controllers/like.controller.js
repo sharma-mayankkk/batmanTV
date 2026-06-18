@@ -179,7 +179,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         },
 
         {
-            $undwind: "$videoDetails"
+            $unwind: "$videoDetails"
         },
 
         {
