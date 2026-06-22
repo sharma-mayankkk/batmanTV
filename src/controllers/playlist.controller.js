@@ -56,22 +56,60 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
                 owner: new mongoose.Types.ObjectId(userId)
             }
         },
+
+        {
+            $lookup: {
+                from: "videos",
+                localField: "videos",
+                foreignField: "_id",
+                pipeline: [
+                    {
+                        $project: {
+                            thumbnail: 1
+                        }
+                    }
+                ],
+                as: "videoDetails"
+            }
+        },
+
         {
             $addFields: {
                 totalVideos: {
                     $size: "$videos"
+                },
+
+                thumbnail: {
+                    $cond: {
+                        if: {
+                            $gt: [
+                                { $size: "$videoDetails" },
+                                0
+                            ]
+                        },
+                        then: {
+                            $arrayElemAt: [
+                                "$videoDetails.thumbnail",
+                                0
+                            ]
+                        },
+                        else: null
+                    }
                 }
             }
         },
+
         {
             $project: {
                 name: 1,
                 description: 1,
-                totalVideos: 1,
                 createdAt: 1,
-                updatedAt: 1
+                updatedAt: 1,
+                totalVideos: 1,
+                thumbnail: 1
             }
         },
+
         {
             $sort: {
                 createdAt: -1
@@ -130,6 +168,18 @@ const getPlaylistById = asyncHandler(async (req, res) => {
                 from: "videos",
                 localField: "videos",
                 foreignField: "_id",
+                pipeline: [
+                    {
+                        $project: {
+                            title: 1,
+                            thumbnail: 1,
+                            description: 1,
+                            duration: 1,
+                            views: 1,
+                            owner: 1
+                        }
+                    }
+                ],
                 as: "videos"
             }
         },
@@ -183,7 +233,7 @@ const updatePLaylist = asyncHandler(async (req, res) => {
         throw new apiError(400, "Invalid playlist id")
     }
 
-    if (!title?.trim() && !description?.trim()) {
+    if (!name?.trim() && !description?.trim()) {
         throw new apiError(400, " Title and description  cannot be empty")
     }
 
@@ -291,7 +341,7 @@ const addVideosToPlaylist = asyncHandler(async (req, res) => {
         .json(
             new apiResponse(
                 200,
-                updatedPLaylist,
+                updatedPlaylist,
                 "Video added to playlist successfully"
             )
         )
@@ -340,7 +390,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         .json(
             new apiResponse(
                 200,
-                updatedPLaylist,
+                updatedPlaylist,
                 "Video removed from playlist successfully"
             )
         )
@@ -353,4 +403,5 @@ export {
     getUserPlaylists,
     addVideosToPlaylist,
     removeVideoFromPlaylist,
+    deletePlaylist,
 }
