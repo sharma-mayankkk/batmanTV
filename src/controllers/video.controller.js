@@ -67,21 +67,70 @@ const getVideoById = asyncHandler(async (req, res) => {
         throw new apiError(400, "Invalid Video Id")
     }
 
-    const video = await Video.findById(videoId)
+    // Increment views first
+    await Video.findByIdAndUpdate(
+        videoId,
+        {
+            $inc: {
+                views: 1
+            }
+        }
+    )
 
-    if (!video) {
+    const video = await Video.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(videoId)
+            }
+        },
+
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails"
+            }
+        },
+
+        {
+            $unwind: "$ownerDetails"
+        },
+
+        {
+            $project: {
+                videoFile: 1,
+                thumbnail: 1,
+                title: 1,
+                description: 1,
+                duration: 1,
+                views: 1,
+                isPublished: 1,
+                createdAt: 1,
+                updatedAt: 1,
+
+                owner: {
+                    _id: "$ownerDetails._id",
+                    username: "$ownerDetails.username",
+                    fullName: "$ownerDetails.fullName",
+                    avatar: "$ownerDetails.avatar",
+                    coverImage: "$ownerDetails.coverImage"
+                }
+            }
+        }
+    ])
+
+    if (!video.length) {
         throw new apiError(404, "Cannot Found Video")
     }
 
-    return res
-        .status(200)
-        .json(
-            new apiResponse(
-                200,
-                video,
-                "Video Fetched Successfully"
-            )
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            video[0],
+            "Video Fetched Successfully"
         )
+    )
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
