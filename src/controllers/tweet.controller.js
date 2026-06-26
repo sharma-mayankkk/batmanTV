@@ -33,32 +33,95 @@ const createTweet = asyncHandler(async (req, res) => {
 })
 
 const getUserTweet = asyncHandler(async (req, res) => {
-    const { userId } = req.params
+    const { userId } = req.params;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        throw new apiError(400, "Invalid user id")
+        throw new apiError(400, "Invalid user id");
     }
 
-    const user = await User.findById(userId)
+    const aggregate = Tweet.aggregate([
+        {
+            $match: {
+                owner: new mongoose.Types.ObjectId(userId)
+            }
+        },
 
-    if (!user) {
-        throw new apiError(404, "User not found")
-    }
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
 
-    const tweets = await Tweet.find({
-        owner: userId
-    }).sort({ createdAt: -1 })
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails"
+            }
+        },
 
-    return res
-        .status(200)
-        .json(
-            new apiResponse(
-                200,
-                tweets,
-                "Tweets fetched successfully"
-            )
+        {
+            $unwind: "$ownerDetails"
+        },
+
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "tweet",
+                as: "likes"
+            }
+        },
+
+        {
+            $addFields: {
+                likesCount: {
+                    $size: "$likes"
+                }
+            }
+        },
+
+        {
+            $project: {
+                _id: 1,
+                content: 1,
+                createdAt: 1,
+                updatedAt: 1,
+
+                owner: {
+                    _id: "$ownerDetails._id",
+                    username: "$ownerDetails.username",
+                    fullName: "$ownerDetails.fullName",
+                    avatar: "$ownerDetails.avatar"
+                },
+
+                likesCount: 1
+            }
+        }
+    ]);
+
+    const options = {
+        page,
+        limit
+    };
+
+    const tweets = await Tweet.aggregatePaginate(
+        aggregate,
+        options
+    );
+
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            tweets,
+            "Tweets fetched successfully"
         )
-})
+    );
+});
 
 const updateTweet = asyncHandler(async (req, res) => {
     const { tweetId } = req.params
