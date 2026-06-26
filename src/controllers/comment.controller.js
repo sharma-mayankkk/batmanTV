@@ -6,49 +6,95 @@ import { Comment } from "../models/comment.model.js"
 import { apiResponse } from "../utils/apiResponse.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
+    const { videoId } = req.params;
 
-    const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 10
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
-        throw new apiError(400, "Invalid video Id")
+        throw new apiError(400, "Invalid video Id");
     }
 
-    const video = await Video.findById(videoId)
+    const aggregate = Comment.aggregate([
+        {
+            $match: {
+                video: new mongoose.Types.ObjectId(videoId)
+            }
+        },
 
-    if (!video) {
-        throw new apiError(404, "Video not found")
-    }
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
 
-    const totalComments = await Comment.countDocuments({
-        video: videoId
-    })
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails"
+            }
+        },
 
-    const comments = await Comment.find({
-        video: videoId
-    })
-        .populate(
-            "owner",
-            "username fullName avatar"
-        )
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
+        {
+            $unwind: "$ownerDetails"
+        },
+
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "comment",
+                as: "likes"
+            }
+        },
+
+        {
+            $addFields: {
+                likesCount: {
+                    $size: "$likes"
+                }
+            }
+        },
+
+        {
+            $project: {
+                _id: 1,
+                content: 1,
+                createdAt: 1,
+                updatedAt: 1,
+
+                owner: {
+                    _id: "$ownerDetails._id",
+                    username: "$ownerDetails.username",
+                    fullName: "$ownerDetails.fullName",
+                    avatar: "$ownerDetails.avatar"
+                },
+
+                likesCount: 1
+            }
+        }
+    ]);
+
+    const options = {
+        page,
+        limit
+    };
+
+    const comments = await Comment.aggregatePaginate(
+        aggregate,
+        options
+    );
 
     return res.status(200).json(
         new apiResponse(
             200,
-            {
-                comments,
-                totalComments,
-                currentPage: page,
-                totalPages: Math.ceil(totalComments / limit)
-            },
-            "Comments Fetched Successfully"
+            comments,
+            "Comments fetched successfully"
         )
-    )
-})
+    );
+});
 
 const addComment = asyncHandler(async (req, res) => {
     const { content } = req.body
