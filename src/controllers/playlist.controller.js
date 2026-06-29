@@ -35,7 +35,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 })
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
-    const { userId } = req.params
+    const { userId } = req.params 
 
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10

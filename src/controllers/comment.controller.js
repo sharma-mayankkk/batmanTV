@@ -6,7 +6,7 @@ import { Comment } from "../models/comment.model.js"
 import { apiResponse } from "../utils/apiResponse.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
-    const { videoId } = req.params;
+    const { videoId } = req.params
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
