@@ -4,6 +4,7 @@ import { Video } from '../models/video.model.js'
 import { apiResponse } from "../utils/apiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import mongoose from "mongoose"
+import { User } from "../models/user.model.js";
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description } = req.body
@@ -73,6 +74,28 @@ const getVideoById = asyncHandler(async (req, res) => {
         {
             $inc: {
                 views: 1
+            }
+        }
+    )
+
+    // Update watch history
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $pull: {
+                watchHistory: videoId
+            }
+        }
+    )
+
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $push: {
+                watchHistory: {
+                    $each: [new mongoose.Types.ObjectId(videoId)],
+                    $position: 0
+                }
             }
         }
     )
