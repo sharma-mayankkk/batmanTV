@@ -35,9 +35,20 @@ const navItems = [
   },
 ];
 
-function Sidebar() {
+function Sidebar({ isSidebarOpen }) {
   return (
-    <aside className="w-64 h-[calc(100vh-64px)] overflow-y-auto bg-[#0f0f0f] px-3 py-3">
+    <aside
+      className={`
+            h-[calc(100vh-64px)]
+            overflow-y-auto overflow-x-visible
+            bg-[#0f0f0f]
+            py-4
+            scrollbar-hide
+            transition-all
+            duration-300
+            ${isSidebarOpen ? "w-64 px-3" : "w-20 px-2"}
+          `}
+    >
 
       <nav className="flex flex-col gap-1">
 
@@ -48,34 +59,85 @@ function Sidebar() {
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) =>
-                `
-                flex
-                items-center
-                gap-6
-                h-11
-                px-4
-                rounded-xl
-                transition-all
-                duration-200
-                ${
-                  isActive
-                    ? "bg-[#272727] text-white font-medium"
-                    : "text-zinc-300 hover:bg-[#272727] hover:text-white"
-                }
-                `
-              }
             >
-              <Icon size={23} strokeWidth={2.2} />
+              {({ isActive }) => (
+                <div
+                  className={`
+                    group
+                    relative
+                    flex
+                    items-center
+                    ${isSidebarOpen ? "gap-5" : "justify-center"}
+                    h-11
+                    px-4
+                    rounded-xl
+                    cursor-pointer
+                    select-none
+                    transition-all
+                    duration-200
+                    ease-out
+                    ${isActive
+                      ? "bg-[#272727] text-white font-semibold translate-x-1"
+                      : "text-zinc-300 hover:bg-[#272727] hover:text-white hover:translate-x-1"
+                    }
+                  `}
+                >
+                  {isActive && (
+                    <span className="absolute left-0 h-6 w-1 rounded-r-full bg-white" />
+                  )}
 
-              <span className="text-[17px]">
-                {item.name}
-              </span>
+                  <Icon
+                    size={22}
+                    strokeWidth={2.2}
+                    className={`
+                      transition-transform
+                      duration-200
+                      ${isActive
+                        ? "scale-110"
+                        : "group-hover:scale-105"
+                      }
+                    `}
+                  />
+
+                  {!isSidebarOpen && (
+                    <div
+                      className="
+                          absolute
+                          left-16
+                          z-50
+                          pointer-events-none
+                          rounded-md
+                          bg-[#272727]
+                          px-3
+                          py-2
+                          text-sm
+                          text-white
+                          opacity-0
+                          shadow-lg
+                          transition-all
+                          duration-200
+                          group-hover:translate-x-1
+                          group-hover:opacity-100
+                          whitespace-nowrap
+                        "
+                    >
+                      {item.name}
+                    </div>
+                  )}
+
+                  {isSidebarOpen && (
+                    <span className="text-[15px] tracking-wide whitespace-nowrap">
+                      {item.name}
+                    </span>
+                  )}
+                </div>
+              )}
             </NavLink>
           );
         })}
 
       </nav>
+
     </aside>
   );
 }

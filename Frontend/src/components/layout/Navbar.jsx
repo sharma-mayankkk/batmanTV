@@ -1,4 +1,4 @@
-import { Search, Upload, Bell } from "lucide-react";
+import { Search, Upload, Bell, Menu } from "lucide-react";
 import logo from "../../assets/batlogo.png"; // Change path if needed
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -9,7 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/authSlice";
 import { logoutUser } from "../../api/auth";
 
-function Navbar() {
+function Navbar({
+    isSidebarOpen,
+    setIsSidebarOpen,
+}) {
     const { user, isAuthenticated } = useSelector(
         (state) => state.auth
     );
@@ -87,7 +90,26 @@ function Navbar() {
 
                 {/* LEFT */}
 
-                <div className="flex items-center">
+                <div className="flex items-center gap-3">
+
+                    <button
+                        onClick={() => setIsSidebarOpen((prev) => !prev)}
+                        className="
+            w-10
+            h-10
+            rounded-full
+            flex
+            items-center
+            justify-center
+            transition-all
+            duration-200
+            hover:bg-[#272727]
+            hover:scale-105
+            active:scale-95
+        "
+                    >
+                        <Menu size={22} />
+                    </button>
 
                     <img
                         src={logo}
