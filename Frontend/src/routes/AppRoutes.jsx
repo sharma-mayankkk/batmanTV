@@ -1,5 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoutes from "./ProtectedRoutes";
+import PublicRoutes from "./PublicRoutes";
 
 import Home from "../pages/Home";
 import Login from "../pages/Login";
@@ -23,30 +25,41 @@ function AppRoutes() {
             {/* Main Application Layout */}
             <Route element={<MainLayout />}>
 
+                {/* Public Pages */}
+
                 <Route index element={<Home />} />
 
                 <Route path="watch/:videoId" element={<Video />} />
 
                 <Route path="channel/:username" element={<Channel />} />
 
-                <Route path="dashboard" element={<Dashboard />} />
+                {/* Protected Pages */}
 
-                <Route path="playlist/:playlistId" element={<Playlist />} />
+                <Route element={<ProtectedRoutes />}>
 
-                <Route path="history" element={<History />} />
+                    <Route path="dashboard" element={<Dashboard />} />
 
-                <Route path="tweets" element={<Tweets />} />
+                    <Route path="playlist/:playlistId" element={<Playlist />} />
 
-                <Route path="liked-videos" element={<LikedVideos />} />
+                    <Route path="history" element={<History />} />
+
+                    <Route path="tweets" element={<Tweets />} />
+
+                    <Route path="liked-videos" element={<LikedVideos />} />
+
+                </Route>
 
             </Route>
 
-            {/* Authentication Layout */}
-            <Route element={<AuthLayout />}>
+            <Route element={<PublicRoutes />}>
 
-                <Route path="login" element={<Login />} />
+                <Route element={<AuthLayout />}>
 
-                <Route path="register" element={<Register />} />
+                    <Route path="login" element={<Login />} />
+
+                    <Route path="register" element={<Register />} />
+
+                </Route>
 
             </Route>
 
