@@ -78,27 +78,29 @@ const getVideoById = asyncHandler(async (req, res) => {
         }
     )
 
-    // Update watch history
-    await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $pull: {
-                watchHistory: videoId
+    // Update watch history only for logged-in users
+    if (req.user) {
+        await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $pull: {
+                    watchHistory: videoId,
+                },
             }
-        }
-    )
+        );
 
-    await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $push: {
-                watchHistory: {
-                    $each: [new mongoose.Types.ObjectId(videoId)],
-                    $position: 0
-                }
+        await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $push: {
+                    watchHistory: {
+                        $each: [new mongoose.Types.ObjectId(videoId)],
+                        $position: 0,
+                    },
+                },
             }
-        }
-    )
+        );
+    }
 
     const video = await Video.aggregate([
         {
