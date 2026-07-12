@@ -76,3 +76,34 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ---------- Plyr Theme ---------- */
+
+:root {
+  --plyr-color-main: #ef4444;
+}
+
+.plyr {
+  border-radius: 1rem;
+}
+
+.plyr--video {
+  background: #000;
+}
+
+.plyr__control:hover {
+  background: #ef4444 !important;
+}
+
+.plyr__menu__container {
+  background: #18181b !important;
+  color: white;
+}
+
+.plyr__menu__container .plyr__control {
+  color: white;
+}
+
+.plyr__menu__container .plyr__control:hover {
+  background: #27272a !important;
+}
