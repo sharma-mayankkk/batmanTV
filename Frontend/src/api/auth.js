@@ -14,3 +14,17 @@ export const logoutUser = async () => {
   const { data } = await axios.post("/users/logout");
   return data;
 };
+
+export const registerUser = async (formData) => {
+    const { data } = await axios.post(
+        "/users/register",
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+
+    return data.data;
+};
