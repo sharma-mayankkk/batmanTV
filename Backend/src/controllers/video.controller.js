@@ -123,6 +123,22 @@ const getVideoById = asyncHandler(async (req, res) => {
         },
 
         {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "video",
+                as: "likes"
+            }
+        },
+        {
+            $addFields: {
+                likesCount: {
+                    $size: "$likes"
+                }
+            }
+        },
+
+        {
             $project: {
                 videoFile: 1,
                 thumbnail: 1,
@@ -133,6 +149,7 @@ const getVideoById = asyncHandler(async (req, res) => {
                 isPublished: 1,
                 createdAt: 1,
                 updatedAt: 1,
+                likesCount: 1,
 
                 owner: {
                     _id: "$ownerDetails._id",
