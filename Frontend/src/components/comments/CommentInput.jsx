@@ -66,7 +66,7 @@ function CommentInput({ videoId, onCommentPosted }) {
 
       textareaRef.current.focus();
     } catch (err) {
-      console.error(err);
+      console.error(err)
     } finally {
       setPosting(false);
     }

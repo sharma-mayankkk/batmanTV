@@ -1,5 +1,61 @@
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+
+import {
+  toggleSubscription,
+  getChannelSubscribers,
+} from "../../api/subscription";
+
 function ChannelInfo({ video }) {
+  const user = useSelector((state) => state.auth.user);
+
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [subscribed, setSubscribed] = useState(false);
+
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      try {
+        const data = await getChannelSubscribers(video.owner._id);
+
+        setSubscriberCount(data.length);
+
+        if (user) {
+          const alreadySubscribed = data.some(
+            (sub) => sub._id === user._id
+          );
+
+          setSubscribed(alreadySubscribed);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (video) {
+      fetchSubscribers();
+    }
+  }, [video, user]);
+
   if (!video) return null;
+
+  const handleSubscribe = async () => {
+    if (!user) {
+      alert("Please login to subscribe.");
+      return;
+    }
+
+    try {
+      const res = await toggleSubscription(video.owner._id);
+
+      setSubscribed(res.isSubscribed);
+
+      setSubscriberCount((prev) =>
+        res.isSubscribed ? prev + 1 : Math.max(prev - 1, 0)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <section
@@ -17,7 +73,6 @@ function ChannelInfo({ video }) {
         hover:border-zinc-700
       "
     >
-      {/* Left */}
       <div className="flex items-center gap-4">
         <img
           src={video.owner.avatar}
@@ -41,31 +96,31 @@ function ChannelInfo({ video }) {
             @{video.owner.username}
           </p>
 
-          {/* Temporary until subscribers API */}
           <p className="mt-1 text-xs text-zinc-500">
-            Subscribers coming soon
+            {subscriberCount} subscribers
           </p>
         </div>
       </div>
 
-      {/* Right */}
       <button
-        className="
+        onClick={handleSubscribe}
+        className={`
           rounded-full
-          bg-white
           px-6
           py-2.5
           text-sm
           font-semibold
-          text-black
           transition-all
           duration-200
-          hover:scale-105
-          hover:bg-zinc-200
           active:scale-95
-        "
+          ${
+            subscribed
+              ? "bg-zinc-700 text-white hover:bg-zinc-600"
+              : "bg-white text-black hover:bg-zinc-200"
+          }
+        `}
       >
-        Subscribe
+        {subscribed ? "Subscribed" : "Subscribe"}
       </button>
     </section>
   );

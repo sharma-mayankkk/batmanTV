@@ -41,7 +41,10 @@ function CommentCard({ comment, onCommentUpdated, onCommentDeleted, }) {
             setEditing(false);
 
             onCommentUpdated();
-        } finally {
+        } catch (err) {
+            console.error(err);
+        }
+        finally {
             setLoading(false);
         }
     };
@@ -54,7 +57,7 @@ function CommentCard({ comment, onCommentUpdated, onCommentDeleted, }) {
 
             onCommentDeleted();
         } catch (err) {
-            console.error(err);
+            console.error(err)
         }
     };
     return (

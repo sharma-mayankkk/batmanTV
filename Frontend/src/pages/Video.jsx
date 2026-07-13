@@ -10,6 +10,10 @@ import VideoActions from "../components/video/VideoActions";
 import Description from "../components/video/Description";
 import CommentSection from "../components/comments/CommentSection";
 import RecommendedVideos from "../components/video/RecommendedVideos";
+import WatchHeaderSkeleton from "../components/video/WatchHeaderSkeleton";
+import RecommendedVideoSkeleton from "../components/video/RecommendedVideoSkeleton";
+import CommentSkeleton from "../components/comments/CommentSkeleton";
+import ErrorState from "../components/common/ErrorState";
 
 function Video() {
   const { videoId } = useParams();
@@ -40,17 +44,35 @@ function Video() {
 
   if (loading) {
     return (
-      <div className="flex h-[70vh] items-center justify-center text-zinc-400">
-        Loading video...
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_380px]">
+        {/* Left */}
+        <div className="space-y-6">
+          <WatchHeaderSkeleton />
+
+          <div className="space-y-6">
+            <CommentSkeleton />
+            <CommentSkeleton />
+            <CommentSkeleton />
+          </div>
+        </div>
+
+        {/* Right */}
+        <aside className="space-y-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <RecommendedVideoSkeleton key={index} />
+          ))}
+        </aside>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-[70vh] items-center justify-center text-red-500">
-        {error}
-      </div>
+      <ErrorState
+        title="Video unavailable"
+        description="The video may have been removed or is temporarily unavailable."
+        onRetry={() => window.location.reload()}
+      />
     );
   }
 

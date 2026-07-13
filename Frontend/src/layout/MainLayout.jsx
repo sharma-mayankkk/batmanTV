@@ -15,16 +15,21 @@ function MainLayout() {
                 setIsSidebarOpen={setIsSidebarOpen}
             />
 
-            <div className="flex">
-
+            <div className="pt-16 flex">
                 <Sidebar isSidebarOpen={isSidebarOpen} />
 
-                <main className="flex-1 p-6">
+                <main
+                    className={`
+                        flex-1
+                        p-6
+                        transition-all
+                        duration-300
+                        ${isSidebarOpen ? "ml-64" : "ml-20"}
+                        `}
+                >
                     <Outlet />
                 </main>
-
             </div>
-
         </div>
     );
 }

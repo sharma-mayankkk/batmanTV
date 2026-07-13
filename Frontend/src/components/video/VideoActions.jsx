@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -5,7 +7,16 @@ import {
   Bookmark,
 } from "lucide-react";
 
-function VideoActions() {
+import { toggleVideoLike } from "../../api/like";
+import ShareModal from "../common/ShareModal";
+
+function VideoActions({ video }) {
+  const user = useSelector((state) => state.auth.user);
+
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(video.likesCount || 0);
+  const [shareOpen, setShareOpen] = useState(false);
+
   const buttonClass = `
     flex
     items-center
@@ -27,28 +38,78 @@ function VideoActions() {
     active:scale-95
   `;
 
+  const handleLike = async () => {
+    if (!user) {
+      alert("Please login to like videos ❤️");
+      return;
+    }
+
+    try {
+      const res = await toggleVideoLike(video._id);
+
+      setLiked(res.isLiked);
+
+      setLikes((prev) =>
+        res.isLiked ? prev + 1 : Math.max(prev - 1, 0)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <section className="flex flex-wrap gap-3">
-      <button className={buttonClass}>
-        <ThumbsUp size={18} />
-        <span>Like</span>
-      </button>
+    <>
+      <section className="flex flex-wrap gap-3">
+        <button
+          onClick={handleLike}
+          className={`${buttonClass} ${liked
+            ? "bg-white text-black border-white"
+            : ""
+            }`}
+        >
+          <ThumbsUp
+            size={18}
+            className={`transition-all duration-200 ${liked
+              ? "text-red-500 fill-red-500 scale-110"
+              : "text-zinc-200"
+              }`}
+          />
 
-      <button className={buttonClass}>
-        <ThumbsDown size={18} />
-        <span>Dislike</span>
-      </button>
+          <span
+            className={`transition-colors duration-200 ${liked ? "text-red-500" : "text-zinc-200"
+              }`}
+          >
+            {likes}
+          </span>
+        </button>
 
-      <button className={buttonClass}>
-        <Share2 size={18} />
-        <span>Share</span>
-      </button>
+        <button className={buttonClass}>
+          <ThumbsDown size={18} />
+          <span>Dislike</span>
+        </button>
 
-      <button className={buttonClass}>
-        <Bookmark size={18} />
-        <span>Save</span>
-      </button>
-    </section>
+
+        <button
+          onClick={() => setShareOpen(true)}
+          className={buttonClass}
+        >
+          <Share2 size={18}/>
+          <span>Share</span>
+        </button>
+
+        <button className={buttonClass}>
+          <Bookmark size={18} />
+          <span>Save</span>
+        </button>
+      </section>
+      
+      <ShareModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        url={window.location.href}
+      />
+
+    </>
   );
 }
 

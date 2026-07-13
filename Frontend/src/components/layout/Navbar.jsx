@@ -84,7 +84,7 @@ function Navbar({
 
 
     return (
-        <header className="sticky top-0 z-50 h-16 bg-[#0f0f0f] border-b border-zinc-800">
+        <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-[#0f0f0f] border-b border-zinc-800">
 
             <div className="grid grid-cols-[260px_1fr_220px] items-center h-full px-5">
 

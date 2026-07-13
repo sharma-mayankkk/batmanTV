@@ -37,18 +37,23 @@ const navItems = [
 
 function Sidebar({ isSidebarOpen }) {
   return (
-    <aside
-      className={`
-            h-[calc(100vh-64px)]
-            overflow-y-auto overflow-x-visible
-            bg-[#0f0f0f]
-            py-4
-            scrollbar-hide
-            transition-all
-            duration-300
-            ${isSidebarOpen ? "w-64 px-3" : "w-20 px-2"}
-          `}
-    >
+<aside
+  className={`
+    fixed
+    left-0
+    top-16
+    h-[calc(100vh-64px)]
+    overflow-y-auto
+    overflow-x-visible
+    bg-[#0f0f0f]
+    py-4
+    scrollbar-hide
+    transition-all
+    duration-300
+    z-30
+    ${isSidebarOpen ? "w-64 px-3" : "w-20 px-2"}
+  `}
+>
 
       <nav className="flex flex-col gap-1">
 
