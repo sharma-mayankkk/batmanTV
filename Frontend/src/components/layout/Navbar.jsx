@@ -95,37 +95,39 @@ function Navbar({
                     <button
                         onClick={() => setIsSidebarOpen((prev) => !prev)}
                         className="
-            w-10
-            h-10
-            rounded-full
-            flex
-            items-center
-            justify-center
-            transition-all
-            duration-200
-            hover:bg-[#272727]
-            hover:scale-105
-            active:scale-95
-        "
+                            w-10
+                            h-10
+                            rounded-full
+                            flex
+                            items-center
+                            justify-center
+                            transition-all
+                            duration-200
+                            hover:bg-[#272727]
+                            hover:scale-105
+                            active:scale-95
+                        "
                     >
                         <Menu size={22} />
                     </button>
 
-                    <img
-                        src={logo}
-                        alt="BatmanTV"
-                        className="
-                            h-10
-                            object-contain
-                            cursor-pointer
-                            select-none
-                            transition-all
-                            duration-300
-                            hover:scale-105
-                            hover:opacity-90
-                            active:scale-95
-                        "
-                    />
+                    <Link to="/">
+                        <img
+                            src={logo}
+                            alt="BatmanTV"
+                            className="
+                                h-10
+                                object-contain
+                                cursor-pointer
+                                select-none
+                                transition-all
+                                duration-300
+                                hover:scale-105
+                                hover:opacity-90
+                                active:scale-95
+                            "
+                        />
+                    </Link>
 
                 </div>
 
@@ -190,8 +192,10 @@ function Navbar({
                 {/* RIGHT */}
 
                 <div className="flex justify-end items-center gap-3">
-
-                    <button className={iconButtonClass}>
+                    <button
+                        onClick={() => navigate("/upload")}
+                        className={iconButtonClass}
+                    >
                         <Upload size={22} />
                     </button>
 

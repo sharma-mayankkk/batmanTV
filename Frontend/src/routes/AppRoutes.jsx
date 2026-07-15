@@ -14,6 +14,7 @@ import History from "../pages/History";
 import Tweets from "../pages/Tweets";
 import LikedVideos from "../pages/LikedVideos";
 import NotFound from "../pages/NotFound";
+import UploadVideo from "../pages/UploadVideo";
 
 import MainLayout from "../layout/MainLayout";
 import AuthLayout from "../layout/AuthLayout";
@@ -38,6 +39,8 @@ function AppRoutes() {
                 <Route element={<ProtectedRoutes />}>
 
                     <Route path="dashboard" element={<Dashboard />} />
+
+                    <Route path="upload" element={<UploadVideo />} />
 
                     <Route path="playlist/:playlistId" element={<Playlist />} />
 
