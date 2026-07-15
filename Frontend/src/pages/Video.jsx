@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { getVideoById } from "../api/video";
+import { useLocation } from "react-router-dom";
 
 import VideoPlayer from "../components/video/VideoPlayer";
 import VideoInfo from "../components/video/VideoInfo";
@@ -21,6 +22,7 @@ function Video() {
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const location = useLocation();
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -41,6 +43,13 @@ function Video() {
 
     fetchVideo();
   }, [videoId]);
+
+
+  useEffect(() => {
+    if (location.state?.uploaded) {
+      alert("Video uploaded successfully!");
+    }
+  }, []);
 
   if (loading) {
     return (
