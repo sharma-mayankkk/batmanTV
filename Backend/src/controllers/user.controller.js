@@ -333,74 +333,139 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 })
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
-    const { username } = req.params
+    const { username } = req.params;
+
     if (!username?.trim()) {
-        throw new apiError(400, "Username is missing")
+        throw new apiError(400, "Username is missing");
     }
 
     const channel = await User.aggregate([
         {
             $match: {
-                username: username?.toLowerCase()
-            }
+                username: username.toLowerCase(),
+            },
         },
+
+        // Subscribers
         {
             $lookup: {
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
-                as: "subscribers"
-            }
+                as: "subscribers",
+            },
         },
+
+        // Channels this user subscribed to
         {
             $lookup: {
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "subscriber",
-                as: "subscriberdTo"
-            }
+                as: "subscriberdTo",
+            },
         },
+
+        // User's published videos
+        {
+            $lookup: {
+                from: "videos",
+                let: {
+                    ownerId: "$_id",
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    {
+                                        $eq: ["$owner", "$$ownerId"],
+                                    },
+                                    {
+                                        $eq: ["$isPublished", true],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                    {
+                        $sort: {
+                            createdAt: -1,
+                        },
+                    },
+                ],
+                as: "videos",
+            },
+        },
+
         {
             $addFields: {
                 subscribersCount: {
-                    $size: "$subscribers"
+                    $size: "$subscribers",
                 },
+
                 channelsSubscribedToCounts: {
-                    $size: "$subscriberdTo"
+                    $size: "$subscriberdTo",
                 },
+
+                videosCount: {
+                    $size: "$videos",
+                },
+
                 isSubscribed: {
                     $cond: {
-                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                        if: {
+                            $in: [req.user?._id, "$subscribers.subscriber"],
+                        },
                         then: true,
                         else: false,
-                    }
-                }
-            }
+                    },
+                },
+            },
         },
+
         {
             $project: {
                 fullName: 1,
                 username: 1,
-                subscribersCount: 1,
-                channelsSubscribedToCounts: 1,
-                isSubscribed: 1,
                 avatar: 1,
                 coverImage: 1,
-                email: 1,
-            }
-        }
-    ])
 
-    if (!channel?.length) {
-        throw new apiError(404, "Channel does not exist")
+                subscribersCount: 1,
+                channelsSubscribedToCounts: 1,
+                videosCount: 1,
+                isSubscribed: 1,
+
+                videos: {
+                    $map: {
+                        input: "$videos",
+                        as: "video",
+                        in: {
+                            _id: "$$video._id",
+                            title: "$$video.title",
+                            thumbnail: "$$video.thumbnail",
+                            views: "$$video.views",
+                            duration: "$$video.duration",
+                            createdAt: "$$video.createdAt",
+                        },
+                    },
+                },
+            },
+        },
+    ]);
+
+    if (!channel.length) {
+        throw new apiError(404, "Channel does not exist");
     }
 
-    return res
-        .status(200)
-        .json(
-            new apiResponse(200, channel[0], "User channel fetched successfully")
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            channel[0],
+            "User channel fetched successfully"
         )
-})
+    );
+});
 
 const getUserWatchHistory = asyncHandler(async (req, res) => {
     const user = await User.aggregate([
