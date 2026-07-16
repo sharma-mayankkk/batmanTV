@@ -13,6 +13,7 @@ import { useState } from "react";
 import { updateComment, deleteComment } from "../../api/comment";
 import { timeAgo } from "../../utils/timeAgo";
 import ConfirmModal from "../common/ConfirmModal";
+import { Link } from "react-router-dom";
 
 function CommentCard({ comment, onCommentUpdated, onCommentDeleted, }) {
 
@@ -64,28 +65,33 @@ function CommentCard({ comment, onCommentUpdated, onCommentDeleted, }) {
         <>
             <article className="flex gap-4">
                 {/* Avatar */}
-                <img
-                    src={comment.owner.avatar}
-                    alt={comment.owner.fullName}
-                    onError={(e) => {
-                        e.target.src =
-                            "https://ui-avatars.com/api/?name=User&background=27272a&color=fff";
-                    }}
-                    className="
-          h-11
-          w-11
-          rounded-full
-          object-cover
-          shrink-0
-        "
-                />
+                <Link to={`/channel/${comment.owner.username}`}>
+                    <img
+                        src={comment.owner.avatar}
+                        alt={comment.owner.fullName}
+                        onError={(e) => {
+                            e.target.src =
+                                "https://ui-avatars.com/api/?name=User&background=27272a&color=fff";
+                        }}
+                        className="
+                        h-11
+                        w-11
+                        rounded-full
+                        object-cover
+                        shrink-0
+                        "
+                    />
+                </Link>
 
                 <div className="flex-1 min-w-0">
                     {/* Header */}
                     <div className="flex flex-wrap items-center gap-2">
-                        <h4 className="font-medium text-white">
+                        <Link
+                            to={`/channel/${comment.owner.username}`}
+                            className="font-medium text-white hover:text-red-500 transition"
+                        >
                             {comment.owner.username}
-                        </h4>
+                        </Link>
 
                         <span className="text-sm text-zinc-500">
                             {timeAgo(comment.createdAt)}
@@ -104,18 +110,18 @@ function CommentCard({ comment, onCommentUpdated, onCommentDeleted, }) {
                                     {showMenu && (
                                         <div
                                             className="
-            absolute
-            right-0
-            top-10
-            w-40
-            overflow-hidden
-            rounded-xl
-            border
-            border-zinc-800
-            bg-zinc-900
-            shadow-xl
-            z-50
-          "
+                                                absolute
+                                                right-0
+                                                top-10
+                                                w-40
+                                                overflow-hidden
+                                                rounded-xl
+                                                border
+                                                border-zinc-800
+                                                bg-zinc-900
+                                                shadow-xl
+                                                z-50
+                                            "
                                         >
                                             <button
                                                 onClick={() => {
@@ -146,15 +152,7 @@ function CommentCard({ comment, onCommentUpdated, onCommentDeleted, }) {
                     </div>
 
                     {/* Content */}
-                    <p
-                        className="
-                        mt-2
-                        whitespace-pre-line
-                        text-[15px]
-                        leading-6
-                        text-zinc-300
-                    "
-                    >
+                    <div className="mt-2">
                         {editing ? (
                             <div className="mt-3">
                                 <textarea
@@ -213,7 +211,7 @@ function CommentCard({ comment, onCommentUpdated, onCommentDeleted, }) {
                                 {comment.content}
                             </p>
                         )}
-                    </p>
+                    </div>
 
                     {/* Actions */}
                     <div className="mt-3 flex items-center gap-5">

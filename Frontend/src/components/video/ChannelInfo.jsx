@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 import {
   toggleSubscription,
@@ -74,27 +75,36 @@ function ChannelInfo({ video }) {
       "
     >
       <div className="flex items-center gap-4">
-        <img
-          src={video.owner.avatar}
-          alt={video.owner.fullName}
-          className="
-            h-14
-            w-14
-            rounded-full
-            object-cover
-            ring-2
-            ring-zinc-800
-          "
-        />
+        <Link to={`/channel/${video.owner.username}`}>
+          <img
+            src={video.owner.avatar}
+            alt={video.owner.fullName}
+            className="
+              h-14
+              w-14
+              rounded-full
+              object-cover
+              ring-2
+              ring-zinc-800
+              transition
+              hover:ring-red-500
+            "
+          />
+        </Link>
 
         <div>
-          <h3 className="text-lg font-semibold text-white">
-            {video.owner.fullName}
-          </h3>
+          <Link
+            to={`/channel/${video.owner.username}`}
+            className="block"
+          >
+            <h3 className="text-lg font-semibold text-white transition hover:text-red-500">
+              {video.owner.fullName}
+            </h3>
 
-          <p className="text-sm text-zinc-400">
-            @{video.owner.username}
-          </p>
+            <p className="text-sm text-zinc-400 transition hover:text-zinc-200">
+              @{video.owner.username}
+            </p>
+          </Link>
 
           <p className="mt-1 text-xs text-zinc-500">
             {subscriberCount} subscribers
@@ -113,10 +123,9 @@ function ChannelInfo({ video }) {
           transition-all
           duration-200
           active:scale-95
-          ${
-            subscribed
-              ? "bg-zinc-700 text-white hover:bg-zinc-600"
-              : "bg-white text-black hover:bg-zinc-200"
+          ${subscribed
+            ? "bg-zinc-700 text-white hover:bg-zinc-600"
+            : "bg-white text-black hover:bg-zinc-200"
           }
         `}
       >

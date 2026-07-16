@@ -113,36 +113,52 @@ function VideoCard({ video, variant = "grid" }) {
       {/* Grid Layout */}
       {!isCompact && (
         <div className="flex gap-3 mt-3">
-          <img
-            loading="lazy"
-            src={video.owner?.avatar}
-            alt={video.owner?.fullName}
-            onError={(e) => {
-              e.target.src =
-                "https://ui-avatars.com/api/?name=User&background=27272a&color=fff";
-            }}
-            className="
-            h-10
-            w-10
-            rounded-full
-            object-cover
-            shrink-0
-            ring-2
-            ring-transparent
-            transition-all
-            duration-300
-            group-hover:ring-zinc-600
-          "
-          />
+          <Link
+            to={`/channel/${video.owner?.username}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              loading="lazy"
+              src={video.owner?.avatar}
+              alt={video.owner?.fullName}
+              onError={(e) => {
+                e.target.src =
+                  "https://ui-avatars.com/api/?name=User&background=27272a&color=fff";
+              }}
+              className="
+                    h-10
+                    w-10
+                    rounded-full
+                    object-cover
+                    shrink-0
+                    ring-2
+                    ring-transparent
+                    transition-all
+                    duration-300
+                    group-hover:ring-zinc-600
+                  "
+            />
+
+          </Link>
 
           <div className="flex min-w-0 flex-col">
             <h3 className="line-clamp-2 text-[16px] font-semibold leading-5 text-white">
               {title}
             </h3>
 
-            <span className="mt-1 text-sm text-zinc-400 transition-colors group-hover:text-zinc-300">
+            <Link
+              to={`/channel/${video.owner?.username}`}
+              onClick={(e) => e.stopPropagation()}
+              className="
+                  mt-1
+                  text-sm
+                  text-zinc-400
+                  transition
+                  hover:text-white
+              "
+            >
               {video.owner?.username}
-            </span>
+            </Link>
 
             <span className="text-sm text-zinc-500">
               {formatViews(views)} views • {timeAgo(createdAt)}
