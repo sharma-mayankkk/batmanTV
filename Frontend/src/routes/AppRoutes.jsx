@@ -19,6 +19,8 @@ import UploadVideo from "../pages/UploadVideo";
 import MainLayout from "../layout/MainLayout";
 import AuthLayout from "../layout/AuthLayout";
 
+import Profile from "../pages/Profile";
+
 function AppRoutes() {
     return (
         <Routes>
@@ -49,6 +51,8 @@ function AppRoutes() {
                     <Route path="tweets" element={<Tweets />} />
 
                     <Route path="liked-videos" element={<LikedVideos />} />
+
+                    <Route path="profile" element={<Profile />} />
 
                 </Route>
 
