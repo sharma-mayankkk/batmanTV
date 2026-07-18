@@ -1,6 +1,6 @@
 // components/video/VideoCard.jsx
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { formatViews } from "../../utils/formatViews";
 import { timeAgo } from "../../utils/timeAgo";
 import { formatDuration } from "../../utils/formatDuration";
@@ -17,6 +17,7 @@ function VideoCard({ video, variant = "grid" }) {
     views,
     createdAt,
   } = video;
+  const navigate = useNavigate();
 
   return (
     <Link
@@ -81,30 +82,30 @@ function VideoCard({ video, variant = "grid" }) {
               "https://placehold.co/1280x720/18181b/ffffff?text=No+Thumbnail";
           }}
           className="
-          h-full
-          w-full
-          object-cover
-          transition-transform
-          duration-500
-          group-hover:scale-105
-          select-none
-        "
+              h-full
+              w-full
+              object-cover
+              transition-transform
+              duration-500
+              group-hover:scale-105
+              select-none
+            "
         />
 
         <span
           className="
-          absolute
-          bottom-1.5
-          right-1.5
-          rounded-md
-          bg-black/85
-          backdrop-blur-sm
-          px-1
-          py-0.5
-          text-xs
-          font-medium
-          text-white
-        "
+              absolute
+              bottom-1.5
+              right-1.5
+              rounded-md
+              bg-black/85
+              backdrop-blur-sm
+              px-1
+              py-0.5
+              text-xs
+              font-medium
+              text-white
+            "
         >
           {formatDuration(duration)}
         </span>
@@ -112,54 +113,64 @@ function VideoCard({ video, variant = "grid" }) {
 
       {/* Grid Layout */}
       {!isCompact && (
-        <div className="flex gap-3 mt-3">
-          <Link
-            to={`/channel/${video.owner?.username}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              loading="lazy"
-              src={video.owner?.avatar}
-              alt={video.owner?.fullName}
-              onError={(e) => {
-                e.target.src =
-                  "https://ui-avatars.com/api/?name=User&background=27272a&color=fff";
-              }}
-              className="
-                    h-10
-                    w-10
-                    rounded-full
-                    object-cover
-                    shrink-0
-                    ring-2
-                    ring-transparent
-                    transition-all
-                    duration-300
-                    group-hover:ring-zinc-600
-                  "
-            />
-
-          </Link>
+        <div className="mt-3 flex gap-3">
+          {/* Avatar */}
+          <img
+            loading="lazy"
+            src={video.owner?.avatar}
+            alt={video.owner?.fullName}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              navigate(`/channel/${video.owner?.username}`);
+            }}
+            onError={(e) => {
+              e.target.src =
+                "https://ui-avatars.com/api/?name=User&background=27272a&color=fff";
+            }}
+            className="
+                h-10
+                w-10
+                shrink-0
+                cursor-pointer
+                rounded-full
+                object-cover
+                ring-2
+                ring-transparent
+                transition-all
+                duration-300
+                hover:scale-105
+              hover:ring-red-600
+              "
+          />
 
           <div className="flex min-w-0 flex-col">
+            {/* Title */}
             <h3 className="line-clamp-2 text-[16px] font-semibold leading-5 text-white">
               {title}
             </h3>
 
-            <Link
-              to={`/channel/${video.owner?.username}`}
-              onClick={(e) => e.stopPropagation()}
+            {/* Channel */}
+            <p
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate(`/channel/${video.owner?.username}`);
+              }}
               className="
-                  mt-1
-                  text-sm
-                  text-zinc-400
-                  transition
-                  hover:text-white
-              "
+          mt-1
+          w-fit
+          cursor-pointer
+          text-sm
+          text-zinc-400
+          transition
+          hover:text-white
+        "
             >
               {video.owner?.username}
-            </Link>
+            </p>
 
+            {/* Stats */}
             <span className="text-sm text-zinc-500">
               {formatViews(views)} views • {timeAgo(createdAt)}
             </span>
@@ -174,7 +185,22 @@ function VideoCard({ video, variant = "grid" }) {
             {title}
           </h3>
 
-          <p className="mt-2 text-sm text-zinc-400">
+          <p
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              navigate(`/channel/${video.owner?.username}`);
+            }}
+            className="
+        mt-2
+        w-fit
+        cursor-pointer
+        text-sm
+        text-zinc-400
+        transition
+        hover:text-white
+      "
+          >
             {video.owner?.username}
           </p>
 
