@@ -266,9 +266,13 @@ function Navbar({
 
                                     </div>
 
-                                    <button className={`${menuItemClass} text-white`}>
-                                        My Channel
-                                    </button>
+                                    <Link to="/profile">
+
+                                        <button className={`${menuItemClass} text-white`}>
+                                            My Profile
+                                        </button>
+
+                                    </Link>
 
                                     <button
                                         onClick={handleLogout}
