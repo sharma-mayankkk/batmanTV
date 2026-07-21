@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import "plyr-react/plyr.css";
 import { Toaster } from "sonner";
+import "cropperjs/dist/cropper.css";
 
 import "./index.css";
 import App from "./App";
