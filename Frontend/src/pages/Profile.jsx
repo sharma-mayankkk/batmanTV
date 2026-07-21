@@ -10,6 +10,9 @@ import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { changePassword } from "../api/user";
 
 import PasswordInput from "../components/profile/PasswordInput";
+import { updateAvatar,updateCoverImage } from "../api/user";
+import ImageCropModal from "../components/common/ImageCropModal";
+import getCroppedImg from "../utils/cropImage";
 
 function Profile() {
     const user = useSelector((state) => state.auth.user);
@@ -37,6 +40,17 @@ function Profile() {
         username: user?.username || "",
         email: user?.email || "",
     });
+
+    const [avatarPreview, setAvatarPreview] = useState(user?.avatar);
+    const [avatarUploading, setAvatarUploading] = useState(false);
+
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [showCropModal, setShowCropModal] = useState(false);
+    const [croppingAvatar, setCroppingAvatar] = useState(true);
+
+    const [coverImage, setCoverImage] = useState(null);
+    const [coverModalOpen, setCoverModalOpen] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -129,6 +143,121 @@ function Profile() {
         }
     };
 
+    const handleCoverSelect = (e) => {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        setCoverImage(URL.createObjectURL(file));
+
+        setCoverModalOpen(true);
+    };
+
+    const handleCoverSave = async (file) => {
+        try {
+
+            setLoading(true);
+
+            const updatedUser = await updateCoverImage(file);
+
+            dispatch(login(updatedUser));
+
+            setCoverModalOpen(false);
+
+            setCoverImage(null);
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert("Cover upload failed");
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    };
+
+    const handleAvatarChange = async (e) => {
+
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        // validation
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Image must be smaller than 5 MB");
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            alert("Invalid image.");
+            return;
+        }
+
+        // instant preview
+
+        setAvatarPreview(URL.createObjectURL(file));
+
+        try {
+
+            setAvatarUploading(true);
+
+            const formData = new FormData();
+
+            formData.append("avatar", file);
+
+            const updatedUser = await updateAvatar(file);
+
+            setAvatarPreview(updatedUser.avatar);
+
+            dispatch(login(updatedUser));
+
+        } catch (err) {
+
+            alert(
+                err.response?.data?.message ||
+                "Avatar update failed."
+            );
+
+            setAvatarPreview(user.avatar);
+
+        } finally {
+
+            setAvatarUploading(false);
+
+        }
+
+    };
+
+    const handleCropSave = async (file) => {
+        try {
+
+            setLoading(true);
+
+            const updatedUser = await updateAvatar(file);
+
+            dispatch(login(updatedUser));
+
+            setShowCropModal(false);
+
+            setSelectedImage(null);
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert("Avatar upload failed");
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    };
+
     return (
 
         <div className="mx-auto max-w-5xl py-8">
@@ -139,13 +268,27 @@ function Profile() {
                 type="file"
                 accept="image/*"
                 hidden
+                onChange={(e) => {
+                    const file = e.target.files[0];
+
+                    if (!file) return;
+
+                    setCroppingAvatar(true);
+
+                    setSelectedFile(file);
+                    setSelectedImage(URL.createObjectURL(file));
+
+                    setShowCropModal(true);
+                }}
             />
 
             <input
-                ref={coverInputRef}
                 type="file"
                 accept="image/*"
+                ref={coverInputRef}
                 hidden
+                onChange={handleCoverSelect}
+
             />
 
             {/* Header */}
@@ -194,21 +337,16 @@ function Profile() {
                         <button
                             onClick={() => coverInputRef.current.click()}
                             className="
-                                flex
-                                items-center
-                                gap-2
+                                absolute
+                                right-4
+                                top-4
                                 rounded-full
-                                bg-white
-                                px-5
-                                py-3
-                                font-medium
-                                text-black
-                                hover:bg-zinc-200
+                                bg-black/70
+                                p-3
+                                hover:bg-red-600
                             "
                         >
                             <Camera size={18} />
-
-                            Change Cover
                         </button>
 
                     </div>
@@ -222,7 +360,7 @@ function Profile() {
                     <div className="relative -mt-14 h-28 w-28">
 
                         <img
-                            src={user?.avatar}
+                            src={avatarPreview}
                             alt={user?.fullName}
                             className="
                                 h-28
@@ -235,19 +373,29 @@ function Profile() {
                         />
 
                         <button
+                            disabled={avatarUploading}
                             onClick={() => avatarInputRef.current.click()}
                             className="
                                 absolute
-                                bottom-1
-                                right-1
+                                bottom-2
+                                right-2
+                                flex
+                                h-10
+                                w-10
+                                items-center
+                                justify-center
                                 rounded-full
-                                bg-red-600
-                                p-2
+                                bg-black/80
                                 transition
-                                hover:bg-red-700
+                                hover:bg-red-600
+                                disabled:opacity-50
                             "
                         >
-                            <Camera size={16} />
+
+                            {avatarUploading
+                                ? "..."
+                                : <Camera size={18} />}
+
                         </button>
 
                     </div>
@@ -554,6 +702,29 @@ function Profile() {
 
             </section>
 
+            {showCropModal && (
+                <ImageCropModal
+                    image={selectedImage}
+                    aspect={1}
+                    onCancel={() => {
+                        setShowCropModal(false);
+                        setSelectedImage(null);
+                    }}
+                    onSave={handleCropSave}
+                />
+            )}
+
+            {coverModalOpen && (
+                <ImageCropModal
+                    image={coverImage}
+                    aspect={16 / 9}
+                    onCancel={() => {
+                        setCoverModalOpen(false);
+                        setCoverImage(null);
+                    }}
+                    onSave={handleCoverSave}
+                />
+            )}
 
         </div>
     );
