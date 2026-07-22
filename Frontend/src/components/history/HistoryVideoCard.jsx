@@ -71,8 +71,8 @@ function HistoryVideoCard({ video }) {
                                 navigate(`/channel/${video.owner.username}`);
                             }}
                             className="
-                                h-8
-                                w-8
+                                h-5
+                                w-5
                                 cursor-pointer
                                 rounded-full
                                 object-cover
