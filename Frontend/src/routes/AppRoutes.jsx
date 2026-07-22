@@ -54,6 +54,8 @@ function AppRoutes() {
 
                     <Route path="profile" element={<Profile />} />
 
+                    <Route path="/history" element={<History />}/>
+
                 </Route>
 
             </Route>
