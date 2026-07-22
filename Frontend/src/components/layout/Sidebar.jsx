@@ -4,7 +4,8 @@ import {
   History,
   Heart,
   LayoutDashboard,
-  ScrollText,
+  Bird,
+  ListVideo
 } from "lucide-react";
 
 const navItems = [
@@ -14,19 +15,24 @@ const navItems = [
     icon: House,
   },
   {
-    name: "History",
-    path: "/history",
-    icon: History,
-  },
-  {
     name: "Liked Videos",
     path: "/liked-videos",
     icon: Heart,
   },
   {
+    name: "Playlists",
+    path: "/playlists",
+    icon: ListVideo,
+  },
+  {
     name: "Tweets",
     path: "/tweets",
-    icon: ScrollText,
+    icon: Bird,
+  },
+  {
+    name: "History",
+    path: "/history",
+    icon: History,
   },
   {
     name: "Dashboard",
