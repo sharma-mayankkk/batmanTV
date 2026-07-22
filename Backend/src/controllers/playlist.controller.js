@@ -35,7 +35,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 })
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
-    const { userId } = req.params 
+    const { userId } = req.params
 
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
@@ -170,13 +170,30 @@ const getPlaylistById = asyncHandler(async (req, res) => {
                 foreignField: "_id",
                 pipeline: [
                     {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner"
+                        }
+                    },
+                    {
+                        $unwind: "$owner"
+                    },
+                    {
                         $project: {
                             title: 1,
                             thumbnail: 1,
                             description: 1,
                             duration: 1,
                             views: 1,
-                            owner: 1
+                            createdAt: 1,
+                            owner: {
+                                _id: "$owner._id",
+                                username: "$owner.username",
+                                fullName: "$owner.fullName",
+                                avatar: "$owner.avatar"
+                            }
                         }
                     }
                 ],
@@ -225,7 +242,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     )
 })
 
-const updatePLaylist = asyncHandler(async (req, res) => {
+const updatePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params
     const { name, description } = req.body
 
@@ -399,7 +416,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 export {
     createPlaylist,
     getPlaylistById,
-    updatePLaylist,
+    updatePlaylist,
     getUserPlaylists,
     addVideosToPlaylist,
     removeVideoFromPlaylist,
