@@ -10,9 +10,10 @@ import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { changePassword } from "../api/user";
 
 import PasswordInput from "../components/profile/PasswordInput";
-import { updateAvatar,updateCoverImage } from "../api/user";
+import { updateAvatar, updateCoverImage } from "../api/user";
 import ImageCropModal from "../components/common/ImageCropModal";
 import getCroppedImg from "../utils/cropImage";
+import { Link } from "react-router-dom"
 
 function Profile() {
     const user = useSelector((state) => state.auth.user);
@@ -291,24 +292,11 @@ function Profile() {
 
             />
 
-            {/* Header */}
-
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-white">
-                    My Profile
-                </h1>
-
-                <p className="mt-2 text-zinc-400">
-                    Manage your BatmanTV account.
-                </p>
-            </div>
-
             {/* Cover */}
 
             <section className="overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111]">
 
                 {/* Cover */}
-
                 <div className="group relative h-60 bg-zinc-900">
 
                     <img
@@ -317,98 +305,137 @@ function Profile() {
                         className="h-full w-full object-cover"
                     />
 
-                    {/* Overlay */}
-
-                    <div
+                    <button
+                        onClick={() => coverInputRef.current.click()}
                         className="
-                            absolute
-                            inset-0
-                            flex
-                            items-center
-                            justify-center
-                            bg-black/50
-                            opacity-0
-                            transition
-                            duration-300
-                            group-hover:opacity-100
-                        "
+                absolute
+                right-4
+                top-4
+                flex
+                h-11
+                w-11
+                items-center
+                justify-center
+                rounded-full
+                bg-black/70
+                opacity-0
+                transition-all
+                duration-300
+                group-hover:opacity-100
+                hover:bg-red-600
+            "
                     >
-
-                        <button
-                            onClick={() => coverInputRef.current.click()}
-                            className="
-                                absolute
-                                right-4
-                                top-4
-                                rounded-full
-                                bg-black/70
-                                p-3
-                                hover:bg-red-600
-                            "
-                        >
-                            <Camera size={18} />
-                        </button>
-
-                    </div>
+                        <Camera size={18} />
+                    </button>
 
                 </div>
 
-                {/* Avatar */}
+                {/* Profile */}
+                <div className="relative px-8 pb-8">
 
-                <div className="relative px-8">
-
-                    <div className="relative -mt-14 h-28 w-28">
+                    {/* Avatar */}
+                    <div className="relative -mt-16 h-32 w-32">
 
                         <img
                             src={avatarPreview}
                             alt={user?.fullName}
                             className="
-                                h-28
-                                w-28
-                                rounded-full
-                                border-4
-                                border-[#111111]
-                                object-cover
-                            "
+                    h-32
+                    w-32
+                    rounded-full
+                    border-4
+                    border-[#111111]
+                    object-cover
+                "
                         />
 
                         <button
                             disabled={avatarUploading}
                             onClick={() => avatarInputRef.current.click()}
                             className="
-                                absolute
-                                bottom-2
-                                right-2
-                                flex
-                                h-10
-                                w-10
-                                items-center
-                                justify-center
-                                rounded-full
-                                bg-black/80
-                                transition
-                                hover:bg-red-600
-                                disabled:opacity-50
-                            "
+                    absolute
+                    bottom-2
+                    right-2
+                    flex
+                    h-10
+                    w-10
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-black/80
+                    transition
+                    hover:bg-red-600
+                    disabled:opacity-50
+                "
                         >
-
-                            {avatarUploading
-                                ? "..."
-                                : <Camera size={18} />}
-
+                            {avatarUploading ? "..." : <Camera size={18} />}
                         </button>
 
                     </div>
 
-                    <div className="mt-5 pb-8">
+                    {/* Info */}
+                    <div
+                        className="
+                mt-6
+                flex
+                flex-col
+                gap-6
+                md:flex-row
+                md:items-center
+                md:justify-between
+            "
+                    >
 
-                        <h2 className="text-2xl font-bold">
-                            {user?.fullName}
-                        </h2>
+                        {/* Left */}
+                        <div>
 
-                        <p className="mt-1 text-zinc-400">
-                            @{user?.username}
-                        </p>
+                            <h2 className="text-3xl font-bold text-white">
+                                {user?.fullName}
+                            </h2>
+
+                            <p className="mt-1 text-zinc-400">
+                                @{user?.username}
+                            </p>
+
+                        </div>
+
+                        {/* Right */}
+                        <div className="flex flex-wrap gap-3">
+
+                            <Link
+                                to={`/channel/${user?.username}`}
+                                className="
+                        rounded-full
+                        border
+                        border-zinc-700
+                        px-5
+                        py-2.5
+                        text-sm
+                        font-medium
+                        transition
+                        hover:bg-zinc-800
+                    "
+                            >
+                                My Channel
+                            </Link>
+
+                            <Link
+                                to="/dashboard"
+                                className="
+                        rounded-full
+                        bg-red-600
+                        px-5
+                        py-2.5
+                        text-sm
+                        font-medium
+                        transition
+                        hover:bg-red-700
+                    "
+                            >
+                                Dashboard
+                            </Link>
+
+                        </div>
 
                     </div>
 
