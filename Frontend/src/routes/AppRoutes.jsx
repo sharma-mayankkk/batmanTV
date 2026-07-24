@@ -9,7 +9,7 @@ import Register from "../pages/Register";
 import Video from "../pages/Video";
 import Channel from "../pages/Channel";
 import Dashboard from "../pages/Dashboard";
-import Playlist from "../pages/Playlist";
+import Playlists from "../pages/Playlists";
 import History from "../pages/History";
 import Tweets from "../pages/Tweets";
 import LikedVideos from "../pages/LikedVideos";
@@ -20,6 +20,7 @@ import MainLayout from "../layout/MainLayout";
 import AuthLayout from "../layout/AuthLayout";
 
 import Profile from "../pages/Profile";
+import PlaylistDetails from "../pages/PlaylistDetails";
 
 function AppRoutes() {
     return (
@@ -44,17 +45,17 @@ function AppRoutes() {
 
                     <Route path="upload" element={<UploadVideo />} />
 
-                    <Route path="playlist/:playlistId" element={<Playlist />} />
+                    <Route path="playlist/:playlistId" element={<PlaylistDetails />} />
 
-                    <Route path="history" element={<History />} />
-
+                    <Route path="playlists" element={<Playlists />}/>
+                    
                     <Route path="tweets" element={<Tweets />} />
 
                     <Route path="liked-videos" element={<LikedVideos />} />
 
                     <Route path="profile" element={<Profile />} />
 
-                    <Route path="/history" element={<History />}/>
+                    <Route path="/history" element={<History />} />
 
                 </Route>
 
