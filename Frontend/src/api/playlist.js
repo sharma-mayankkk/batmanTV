@@ -84,7 +84,7 @@ export const deletePlaylist = async (playlistId) => {
 // Add Video
 // =========================
 
-export const addVideoToPlaylist = async (
+export const addVideosToPlaylist = async (
     playlistId,
     videoId
 ) => {
@@ -100,7 +100,7 @@ export const addVideoToPlaylist = async (
 // Remove Video
 // =========================
 
-export const removeVideoFromPlaylist = async (
+export const removeVideosFromPlaylist = async (
     playlistId,
     videoId
 ) => {
