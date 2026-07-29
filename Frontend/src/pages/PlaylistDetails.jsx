@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { timeAgo } from "../utils/timeAgo";
-import { removeVideoFromPlaylist } from "../api/playlist";
+import { removeVideosFromPlaylist } from "../api/playlist";
 import ConfirmModal from "../components/common/ConfirmModal";
 import { useNavigate } from "react-router-dom";
 
@@ -23,6 +23,7 @@ import {
     deletePlaylist,
 } from "../api/playlist";
 import DropdownMenu from "../components/common/DropdownMenu";
+import { Link } from "react-router-dom";
 
 function PlaylistDetails() {
 
@@ -318,8 +319,9 @@ function PlaylistDetails() {
 
                             playlist.videos.map((video, index) => (
 
-                                <div
+                                <Link
                                     key={video._id}
+                                    to={`/watch/${video._id}`}
                                     className="
                                         group
                                         flex
@@ -413,21 +415,33 @@ function PlaylistDetails() {
 
                                     {/* Menu */}
 
-                                    <button
-                                        className="
-                                            self-start
-                                            rounded-full
-                                            p-2
-                                            opacity-0
-                                            transition
-                                            group-hover:opacity-100
-                                            hover:bg-[#2a2a2a]
-                                        "
+                                    <div
+                                        onClick={(e) => e.preventDefault()}
                                     >
-                                        <MoreVertical size={20} />
-                                    </button>
+                                        <DropdownMenu
+                                            direction="up"
+                                            items={[
+                                                {
+                                                    label: "Share",
+                                                    icon: Share2,
+                                                    onClick: () => {
+                                                        console.log("share");
+                                                    },
+                                                },
+                                                {
+                                                    label: "Remove from Playlist",
+                                                    icon: Trash2,
+                                                    danger: true,
+                                                    onClick: () => {
+                                                        setSelectedVideo(video);
+                                                        setDeleteVideoOpen(true);
+                                                    },
+                                                },
+                                            ]}
+                                        />
+                                    </div>
 
-                                </div>
+                                </Link>
 
                             ))
 
