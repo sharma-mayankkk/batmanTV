@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+// pages/PlaylistDetails.jsx
 
-import { getPlaylistById } from "../api/playlist";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
 import {
     MoreVertical,
     Pencil,
@@ -11,77 +12,64 @@ import {
     Share2,
 } from "lucide-react";
 
-import { timeAgo } from "../utils/timeAgo";
-import { removeVideosFromPlaylist } from "../api/playlist";
-import ConfirmModal from "../components/common/ConfirmModal";
-import { useNavigate } from "react-router-dom";
-
-import PlaylistModal from "../components/playlist/PlaylistModal";
-
+import { getPlaylistById } from "../api/playlist";
 import {
     updatePlaylist,
     deletePlaylist,
+    removeVideosFromPlaylist,
 } from "../api/playlist";
+
 import DropdownMenu from "../components/common/DropdownMenu";
-import { Link } from "react-router-dom";
+import ConfirmModal from "../components/common/ConfirmModal";
+import PlaylistModal from "../components/playlist/PlaylistModal";
+
+import { formatViews } from "../utils/formatViews";
+import { timeAgo } from "../utils/timeAgo";
+import { formatDuration } from "../utils/formatDuration";
 
 function PlaylistDetails() {
-
     const { playlistId } = useParams();
+    const navigate = useNavigate();
 
     const [playlist, setPlaylist] = useState(null);
-
     const [loading, setLoading] = useState(true);
 
     const [selectedVideo, setSelectedVideo] = useState(null);
-
     const [deleteVideoOpen, setDeleteVideoOpen] = useState(false);
 
-    const navigate = useNavigate();
-
     const [modalOpen, setModalOpen] = useState(false);
-
     const [saving, setSaving] = useState(false);
 
     const [deletePlaylistOpen, setDeletePlaylistOpen] =
         useState(false);
 
     const fetchPlaylist = async () => {
-
         try {
-
             setLoading(true);
 
             const data = await getPlaylistById(playlistId);
 
             setPlaylist(data);
-
         } catch (error) {
-
             console.error(error);
-
         } finally {
-
             setLoading(false);
-
         }
-
     };
 
     useEffect(() => {
-
         fetchPlaylist();
-
     }, [playlistId]);
 
+    // =========================
+    // REMOVE VIDEO
+    // =========================
 
     const handleRemoveVideo = async () => {
-
         if (!selectedVideo) return;
 
         try {
-
-            await removeVideoFromPlaylist(
+            await removeVideosFromPlaylist(
                 playlist._id,
                 selectedVideo._id
             );
@@ -93,27 +81,25 @@ function PlaylistDetails() {
                     (video) => video._id !== selectedVideo._id
                 ),
 
-                totalVideos: prev.totalVideos - 1,
+                totalVideos: Math.max(
+                    0,
+                    prev.totalVideos - 1
+                ),
             }));
-
         } catch (error) {
-
             console.error(error);
-
         } finally {
-
             setDeleteVideoOpen(false);
-
             setSelectedVideo(null);
-
         }
-
     };
 
+    // =========================
+    // UPDATE PLAYLIST
+    // =========================
+
     const handleUpdatePlaylist = async (formData) => {
-
         try {
-
             setSaving(true);
 
             await updatePlaylist(
@@ -124,71 +110,65 @@ function PlaylistDetails() {
             await fetchPlaylist();
 
             setModalOpen(false);
-
         } catch (error) {
-
             console.error(error);
-
         } finally {
-
             setSaving(false);
-
         }
-
     };
 
+    // =========================
+    // DELETE PLAYLIST
+    // =========================
+
     const handleDeletePlaylist = async () => {
-
         try {
-
             await deletePlaylist(playlist._id);
 
             navigate("/playlists");
-
         } catch (error) {
-
             console.error(error);
-
         } finally {
-
             setDeletePlaylistOpen(false);
-
         }
-
     };
 
-    if (loading) {
+    // =========================
+    // LOADING
+    // =========================
 
+    if (loading) {
         return (
-            <div className="p-8 text-white">
-                Loading...
+            <div className="flex min-h-[60vh] items-center justify-center text-zinc-400">
+                Loading playlist...
             </div>
         );
+    }
 
+    if (!playlist) {
+        return (
+            <div className="flex min-h-[60vh] items-center justify-center text-zinc-400">
+                Playlist not found.
+            </div>
+        );
     }
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 
-            <div className="flex flex-col gap-10 lg:flex-row">
+            {/* ========================================= */}
+            {/* PLAYLIST HEADER */}
+            {/* ========================================= */}
 
-                {/* ================= LEFT PANEL ================= */}
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
-                <div
-                    className="
-                    lg:sticky
-                    lg:top-24
-                    h-fit
-                    w-full
-                    lg:w-95
-                    shrink-0
-                "
-                >
+                {/* ================= LEFT ================= */}
+
+                <div className="w-full shrink-0 lg:sticky lg:top-24 lg:w-90">
 
                     {/* Thumbnail */}
 
-                    <div className="overflow-hidden rounded-2xl">
-
+                    <div className="overflow-hidden rounded-2xl bg-zinc-900">
                         <img
                             src={
                                 playlist.thumbnail ||
@@ -196,41 +176,48 @@ function PlaylistDetails() {
                             }
                             alt={playlist.name}
                             className="
-                            aspect-video
-                            w-full
-                            object-cover
-                        "
+                                aspect-video
+                                w-full
+                                object-cover
+                            "
                         />
-
                     </div>
 
-                    {/* ================= INFO ================= */}
+                    {/* Playlist Information */}
 
-                    <div className="mt-6">
+                    <div className="mt-5">
 
-                        <h1 className="text-3xl font-bold tracking-tight text-white">
+                        <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                             {playlist.name}
                         </h1>
 
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        {/* Metadata */}
 
-                            <div className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm text-zinc-300">
-                                🎬 {playlist.totalVideos} Videos
-                            </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-400">
 
-                            <div className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm text-zinc-300">
-                                🕒 {timeAgo(playlist.updatedAt)}
-                            </div>
+                            <span>
+                                {playlist.totalVideos} videos
+                            </span>
+
+                            <span className="text-zinc-600">
+                                •
+                            </span>
+
+                            <span>
+                                Updated {timeAgo(playlist.updatedAt)}
+                            </span>
 
                         </div>
+
+                        {/* Description */}
 
                         {playlist.description && (
                             <p
                                 className="
-                                    mt-6
+                                    mt-4
                                     whitespace-pre-line
-                                    text-[15px]
-                                    leading-7
+                                    text-sm
+                                    leading-6
                                     text-zinc-400
                                 "
                             >
@@ -240,61 +227,93 @@ function PlaylistDetails() {
 
                     </div>
 
-                    {/* ================= ACTIONS ================= */}
+                    {/* Actions */}
 
-                    <div className="mt-8 flex items-center gap-3">
+                    <div className="mt-6 flex items-center gap-2">
+
+                        {/* Play All */}
 
                         <button
                             className="
                                 flex
+                                h-11
                                 items-center
                                 gap-2
                                 rounded-full
                                 bg-white
-                                px-6
-                                py-3
-                                font-medium
+                                px-5
+                                text-sm
+                                font-semibold
                                 text-black
                                 transition
                                 hover:bg-zinc-200
                             "
                         >
-                            <Play size={18} fill="black" />
+                            <Play
+                                size={17}
+                                fill="black"
+                            />
+
                             Play All
                         </button>
+
+                        {/* Share */}
 
                         <button
                             className="
                                 flex
+                                h-11
                                 items-center
                                 gap-2
                                 rounded-full
                                 bg-[#272727]
-                                text-white
                                 px-5
-                                h-12
+                                text-sm
                                 font-medium
+                                text-white
                                 transition
-                                hover:bg-[#3b3b3b]
+                                hover:bg-[#333333]
                             "
                         >
-                            <Share2 size={18} />
+                            <Share2 size={17} />
+
                             Share
                         </button>
 
+                        {/* More */}
+
                         <DropdownMenu
-                            direction="up"
+                            trigger={
+                                <button
+                                    className="
+                                        flex
+                                        h-11
+                                        w-11
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        text-zinc-400
+                                        transition
+                                        hover:bg-[#272727]
+                                        hover:text-white
+                                    "
+                                >
+                                    <MoreVertical size={20} />
+                                </button>
+                            }
                             items={[
                                 {
                                     label: "Edit Playlist",
                                     icon: Pencil,
-                                    onClick: () => setModalOpen(true),
+                                    onClick: () =>
+                                        setModalOpen(true),
                                 },
                                 {
                                     label: "Delete Playlist",
                                     icon: Trash2,
                                     danger: true,
-                                    onClick: () => setDeletePlaylistOpen(true),
+                                    onClick: () =>
+                                        setDeletePlaylistOpen(true),
                                 },
                             ]}
                         />
@@ -303,226 +322,353 @@ function PlaylistDetails() {
 
                 </div>
 
-                {/* ================= RIGHT PANEL ================= */}
+                {/* ================= RIGHT ================= */}
 
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
 
-                    <h2 className="mb-5 text-xl font-semibold text-white">
+                    {playlist.videos?.length ? (
 
-                        Playlist Videos
+                        <div className="space-y-1">
 
-                    </h2>
-
-                    <div className="space-y-3">
-
-                        {playlist.videos?.length ? (
-
-                            playlist.videos.map((video, index) => (
-
-                                <Link
-                                    key={video._id}
-                                    to={`/watch/${video._id}`}
-                                    className="
-                                        group
-                                        flex
-                                        gap-4
-                                        rounded-2xl
-                                        p-3
-                                        transition
-                                        hover:bg-[#1a1a1a]
-                                    "
-                                >
-
-                                    {/* Video Number */}
+                            {playlist.videos.map(
+                                (video, index) => (
 
                                     <div
+                                        key={video._id}
                                         className="
+                                            group
                                             flex
-                                            w-8
-                                            items-center
-                                            justify-center
-                                            text-lg
-                                            font-medium
-                                            text-zinc-500
-                                        "
-                                    >
-                                        {index + 1}
-                                    </div>
-
-                                    {/* Thumbnail */}
-
-                                    <div
-                                        className="
-                                            relative
-                                            aspect-video
-                                            w-72
-                                            shrink-0
-                                            overflow-hidden
+                                            gap-3
                                             rounded-xl
+                                            p-2
+                                            transition
+                                            hover:bg-[#1a1a1a]
+                                            sm:gap-4
+                                            sm:p-3
                                         "
                                     >
 
-                                        <img
-                                            src={video.thumbnail}
-                                            alt={video.title}
-                                            className="
-                                                h-full
-                                                w-full
-                                                object-cover
-                                            "
-                                        />
+                                        {/* Number */}
 
-                                        <span
+                                        <div
                                             className="
-                                                absolute
-                                                bottom-2
-                                                right-2
-                                                rounded
-                                                bg-black/80
-                                                px-2
-                                                py-0.5
-                                                text-xs
-                                                text-white
+                                                hidden
+                                                w-6
+                                                shrink-0
+                                                items-center
+                                                justify-center
+                                                text-sm
+                                                text-zinc-500
+                                                sm:flex
                                             "
                                         >
-                                            {video.duration}
-                                        </span>
+                                            {index + 1}
+                                        </div>
 
-                                    </div>
+                                        {/* Thumbnail */}
 
-                                    {/* Info */}
-
-                                    <div className="min-w-0 flex-1">
-
-                                        <h3
+                                        <Link
+                                            to={`/watch/${video._id}`}
                                             className="
-                                                line-clamp-2
-                                                text-lg
-                                                font-medium
-                                                text-white
+                                                relative
+                                                aspect-video
+                                                w-40
+                                                shrink-0
+                                                overflow-hidden
+                                                rounded-lg
+                                                bg-zinc-900
+                                                sm:w-52
+                                                md:w-56
                                             "
                                         >
-                                            {video.title}
-                                        </h3>
 
-                                        <p className="mt-2 text-sm text-zinc-400">
+                                            <img
+                                                src={video.thumbnail}
+                                                alt={video.title}
+                                                loading="lazy"
+                                                className="
+                                                    h-full
+                                                    w-full
+                                                    object-cover
+                                                    transition
+                                                    duration-300
+                                                    group-hover:scale-105
+                                                "
+                                            />
 
-                                            {video.views} views
+                                            {/* Duration */}
 
-                                        </p>
+                                            <span
+                                                className="
+                                                    absolute
+                                                    bottom-1.5
+                                                    right-1.5
+                                                    rounded
+                                                    bg-black/85
+                                                    px-1.5
+                                                    py-0.5
+                                                    text-[11px]
+                                                    font-medium
+                                                    text-white
+                                                "
+                                            >
+                                                {formatDuration(
+                                                    video.duration
+                                                )}
+                                            </span>
+
+                                        </Link>
+
+                                        {/* Video Information */}
+
+                                        <div className="min-w-0 flex-1 py-0.5">
+
+                                            <Link
+                                                to={`/watch/${video._id}`}
+                                            >
+                                                <h3
+                                                    className="
+                                                        line-clamp-2
+                                                        text-[15px]
+                                                        font-semibold
+                                                        leading-5
+                                                        text-white
+                                                        transition
+                                                        group-hover:text-zinc-200
+                                                        sm:text-base
+                                                    "
+                                                >
+                                                    {video.title}
+                                                </h3>
+                                            </Link>
+
+                                            {/* Username */}
+
+                                            {video.owner?.username && (
+                                                <Link
+                                                    to={`/channel/${video.owner.username}`}
+                                                    className="
+                                                        mt-1.5
+                                                        block
+                                                        w-fit
+                                                        text-sm
+                                                        text-zinc-400
+                                                        transition
+                                                        hover:text-white
+                                                    "
+                                                >
+                                                    {video.owner.username}
+                                                </Link>
+                                            )}
+
+                                            {/* Description */}
+
+                                            {video.description && (
+                                                <p
+                                                    className="
+                                                        mt-1
+                                                        hidden
+                                                        line-clamp-2
+                                                        text-sm
+                                                        leading-5
+                                                        text-zinc-500
+                                                        md:block
+                                                    "
+                                                >
+                                                    {video.description}
+                                                </p>
+                                            )}
+
+                                            {/* Stats */}
+
+                                            <div
+                                                className="
+                                                    mt-1.5
+                                                    flex
+                                                    flex-wrap
+                                                    items-center
+                                                    gap-1.5
+                                                    text-xs
+                                                    text-zinc-500
+                                                "
+                                            >
+
+                                                <span>
+                                                    {formatViews(
+                                                        video.views
+                                                    )}{" "}
+                                                    views
+                                                </span>
+
+                                                <span>
+                                                    •
+                                                </span>
+
+                                                <span>
+                                                    {timeAgo(
+                                                        video.createdAt
+                                                    )}
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                        {/* Video Menu */}
+
+                                        <div
+                                            className="shrink-0"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            }}
+                                        >
+
+                                            <DropdownMenu
+                                                trigger={
+                                                    <button
+                                                        className="
+                                                            flex
+                                                            h-9
+                                                            w-9
+                                                            items-center
+                                                            justify-center
+                                                            rounded-full
+                                                            text-zinc-500
+                                                            transition
+                                                            hover:bg-zinc-800
+                                                            hover:text-white
+                                                        "
+                                                    >
+                                                        <MoreVertical
+                                                            size={18}
+                                                        />
+                                                    </button>
+                                                }
+                                                items={[
+                                                    {
+                                                        label: "Share",
+                                                        icon: Share2,
+                                                        onClick: () => {
+                                                            console.log(
+                                                                "share"
+                                                            );
+                                                        },
+                                                    },
+                                                    {
+                                                        label:
+                                                            "Remove Video",
+                                                        icon: Trash2,
+                                                        danger: true,
+                                                        onClick: () => {
+                                                            setSelectedVideo(
+                                                                video
+                                                            );
+
+                                                            setDeleteVideoOpen(
+                                                                true
+                                                            );
+                                                        },
+                                                    },
+                                                ]}
+                                            />
+
+                                        </div>
 
                                     </div>
+                                )
+                            )}
 
-                                    {/* Menu */}
+                        </div>
 
-                                    <div
-                                        onClick={(e) => e.preventDefault()}
-                                    >
-                                        <DropdownMenu
-                                            direction="up"
-                                            items={[
-                                                {
-                                                    label: "Share",
-                                                    icon: Share2,
-                                                    onClick: () => {
-                                                        console.log("share");
-                                                    },
-                                                },
-                                                {
-                                                    label: "Remove from Playlist",
-                                                    icon: Trash2,
-                                                    danger: true,
-                                                    onClick: () => {
-                                                        setSelectedVideo(video);
-                                                        setDeleteVideoOpen(true);
-                                                    },
-                                                },
-                                            ]}
-                                        />
-                                    </div>
+                    ) : (
 
-                                </Link>
+                        /* Empty Playlist */
 
-                            ))
+                        <div
+                            className="
+                                flex
+                                min-h-100
+                                flex-col
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                border
+                                border-dashed
+                                border-zinc-800
+                                bg-[#111111]
+                                px-6
+                                text-center
+                            "
+                        >
 
-                        ) : (
+                            <ListVideo
+                                size={42}
+                                className="text-zinc-600"
+                            />
 
-                            <div
-                                className="
-                                    flex
-                                    h-72
-                                    flex-col
-                                    items-center
-                                    justify-center
-                                    rounded-2xl
-                                    border
-                                    border-dashed
-                                    border-zinc-700
-                                "
-                            >
+                            <h2 className="mt-5 text-xl font-semibold text-white">
+                                No videos yet
+                            </h2>
 
-                                <ListVideo
-                                    size={45}
-                                    className="text-zinc-600"
-                                />
+                            <p className="mt-2 text-sm text-zinc-500">
+                                Add videos to this playlist and they'll appear here.
+                            </p>
 
-                                <h2 className="mt-6 text-xl font-semibold text-white">
+                        </div>
 
-                                    No videos yet
-
-                                </h2>
-
-                                <p className="mt-2 text-zinc-500">
-
-                                    Add videos to this playlist.
-
-                                </p>
-
-                            </div>
-
-                        )}
-
-                    </div>
+                    )}
 
                 </div>
 
             </div>
+
+            {/* ========================================= */}
+            {/* REMOVE VIDEO MODAL */}
+            {/* ========================================= */}
 
             <ConfirmModal
                 open={deleteVideoOpen}
                 title="Remove Video"
                 description={`Remove "${selectedVideo?.title}" from this playlist?`}
                 onCancel={() => {
-
                     setDeleteVideoOpen(false);
-
                     setSelectedVideo(null);
-
                 }}
                 onConfirm={handleRemoveVideo}
             />
+
+            {/* ========================================= */}
+            {/* DELETE PLAYLIST MODAL */}
+            {/* ========================================= */}
 
             <ConfirmModal
                 open={deletePlaylistOpen}
                 title="Delete Playlist"
                 description={`Delete "${playlist?.name}"? This action cannot be undone.`}
-                onCancel={() => setDeletePlaylistOpen(false)}
+                onCancel={() =>
+                    setDeletePlaylistOpen(false)
+                }
                 onConfirm={handleDeletePlaylist}
             />
 
+            {/* ========================================= */}
+            {/* EDIT PLAYLIST MODAL */}
+            {/* ========================================= */}
 
             <PlaylistModal
                 open={modalOpen}
                 mode="edit"
                 initialData={playlist}
                 loading={saving}
-                onClose={() => setModalOpen(false)}
+                onClose={() =>
+                    setModalOpen(false)
+                }
                 onSubmit={handleUpdatePlaylist}
             />
 
         </div>
     );
-
 }
 
 export default PlaylistDetails;
