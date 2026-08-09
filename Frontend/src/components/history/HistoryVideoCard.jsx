@@ -7,10 +7,19 @@ import { timeAgo } from "../../utils/timeAgo";
 
 import HistoryMenu from "./HistoryMenu";
 
-function HistoryVideoCard({ video }) {
+function HistoryVideoCard({ video, showMenu = true }) {
     const navigate = useNavigate();
 
-    const [showMenu, setShowMenu] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const handleWatch = () => {
+        navigate(`/watch/${video._id}`);
+    };
+
+    const handleChannel = (e) => {
+        e.stopPropagation();
+        navigate(`/channel/${video.owner.username}`);
+    };
 
     return (
         <article
@@ -28,7 +37,7 @@ function HistoryVideoCard({ video }) {
             {/* Thumbnail */}
 
             <div
-                onClick={() => navigate(`/watch/${video._id}`)}
+                onClick={handleWatch}
                 className="
                     relative
                     w-70
@@ -43,36 +52,53 @@ function HistoryVideoCard({ video }) {
                 <img
                     src={video.thumbnail}
                     alt={video.title}
-                    className="h-full w-full object-cover"
+                    className="
+                        h-full
+                        w-full
+                        object-cover
+                    "
                 />
             </div>
 
             {/* Right Side */}
 
-            <div className="flex flex-1 justify-between">
+            <div className="flex min-w-0 flex-1 justify-between gap-4">
 
                 {/* Content */}
 
                 <div
-                    className="min-w-0 cursor-pointer"
-                    onClick={() => navigate(`/watch/${video._id}`)}
+                    className="
+                        min-w-0
+                        cursor-pointer
+                    "
+                    onClick={handleWatch}
                 >
-                    <h3 className="text-lg font-semibold leading-6 text-white line-clamp-2">
+                    {/* Title */}
+
+                    <h3
+                        className="
+                            line-clamp-2
+                            text-lg
+                            font-semibold
+                            leading-6
+                            text-white
+                        "
+                    >
                         {video.title}
                     </h3>
 
-                    <div className="mt-3 flex items-center gap-3">
+                    {/* Channel */}
+
+                    <div className="mt-3 flex items-center gap-2">
 
                         <img
                             src={video.owner.avatar}
                             alt={video.owner.fullName}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/channel/${video.owner.username}`);
-                            }}
+                            onClick={handleChannel}
                             className="
                                 h-5
                                 w-5
+                                shrink-0
                                 cursor-pointer
                                 rounded-full
                                 object-cover
@@ -80,10 +106,7 @@ function HistoryVideoCard({ video }) {
                         />
 
                         <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/channel/${video.owner.username}`);
-                            }}
+                            onClick={handleChannel}
                             className="
                                 text-sm
                                 text-zinc-300
@@ -91,58 +114,67 @@ function HistoryVideoCard({ video }) {
                                 hover:text-white
                             "
                         >
-                            {video.owner.fullName}
+                            {video.owner.username}
                         </button>
 
                     </div>
 
+                    {/* Views + Date */}
+
                     <p className="mt-2 text-sm text-zinc-500">
-                        {formatViews(video.views)} views • {timeAgo(video.createdAt)}
+                        {formatViews(video.views)} views •{" "}
+                        {timeAgo(video.createdAt)}
                     </p>
 
-                    <p
-                        className="
-                            mt-3
-                            line-clamp-2
-                            text-sm
-                            leading-6
-                            text-zinc-400
-                        "
-                    >
-                        {video.description}
-                    </p>
+                    {/* Description */}
+
+                    {video.description && (
+                        <p
+                            className="
+                                mt-3
+                                line-clamp-2
+                                text-sm
+                                leading-6
+                                text-zinc-400
+                            "
+                        >
+                            {video.description}
+                        </p>
+                    )}
 
                 </div>
 
                 {/* Menu */}
 
-                <div className="relative shrink-0">
+                {showMenu && (
+                    <div className="relative shrink-0">
 
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setShowMenu((prev) => !prev);
-                        }}
-                        className="
-                            rounded-full
-                            p-2
-                            text-zinc-400
-                            transition
-                            hover:bg-zinc-800
-                            hover:text-white
-                        "
-                    >
-                        <MoreVertical size={20} />
-                    </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setMenuOpen((prev) => !prev);
+                            }}
+                            className="
+                                rounded-full
+                                p-2
+                                text-zinc-400
+                                transition
+                                hover:bg-zinc-800
+                                hover:text-white
+                            "
+                        >
+                            <MoreVertical size={20} />
+                        </button>
 
-                    {showMenu && (
-                        <HistoryMenu
-                            onClose={() => setShowMenu(false)}
-                            video={video}
-                        />
-                    )}
+                        {menuOpen && (
+                            <HistoryMenu
+                                onClose={() => setMenuOpen(false)}
+                                video={video}
+                            />
+                        )}
 
-                </div>
+                    </div>
+                )}
 
             </div>
 
