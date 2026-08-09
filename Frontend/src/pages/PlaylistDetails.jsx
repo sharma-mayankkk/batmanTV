@@ -171,7 +171,7 @@ function PlaylistDetails() {
                     <div className="overflow-hidden rounded-2xl bg-zinc-900">
                         <img
                             src={
-                                playlist.thumbnail ||
+                                playlist.videos?.[0]?.thumbnail ||
                                 "https://placehold.co/1280x720/18181b/ffffff?text=Playlist"
                             }
                             alt={playlist.name}

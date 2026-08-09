@@ -3,9 +3,9 @@ import { timeAgo } from "../../utils/timeAgo";
 import {
     Play,
     ListVideo,
-    MoreVertical,
     Pencil,
     Trash2,
+    MoreVertical,
 } from "lucide-react";
 
 import DropdownMenu from "../common/DropdownMenu";
@@ -15,10 +15,8 @@ function PlaylistCard({
     onDelete,
     onEdit,
 }) {
-
     return (
-        <Link
-            to={`/playlist/${playlist._id}`}
+        <div
             className="
                 group
                 relative
@@ -35,160 +33,215 @@ function PlaylistCard({
             "
         >
 
-            <div className="absolute right-3 top-3 z-20">
+            {/* Dropdown */}
 
+            <div
+                className="
+                    absolute
+                    right-3
+                    top-3
+                    z-30
+                "
+            >
                 <DropdownMenu
                     direction="down"
+                    trigger={
+                        <button
+                            type="button"
+                            className="
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-black/10
+                                text-white
+                                backdrop-blur-md
+                                transition
+                                hover:bg-white/10
+                            "
+                        >
+                            <MoreVertical size={20} />
+                        </button>
+                    }
                     items={[
                         {
                             label: "Edit Playlist",
                             icon: Pencil,
-                            onClick: () => onEdit(playlist),
+                            onClick: () => onEdit?.(playlist),
                         },
                         {
                             label: "Delete Playlist",
                             icon: Trash2,
                             danger: true,
-                            onClick: () => onDelete(playlist),
+                            onClick: () => onDelete?.(playlist),
                         },
                     ]}
                 />
-
             </div>
 
-            {/* Thumbnail */}
+            {/* Card Link */}
 
-            <div
-                className="
-                    relative
-                    aspect-video
-                    overflow-hidden
-                    bg-zinc-900
-                "
+            <Link
+                to={`/playlist/${playlist._id}`}
+                className="block"
             >
 
-                <img
-                    src={
-                        playlist.thumbnail ||
-                        "https://placehold.co/1280x720/18181b/ffffff?text=Playlist"
-                    }
-                    alt={playlist.name}
-                    className="
-                        h-full
-    w-full
-    object-cover
-    transition-opacity
-    duration-300
-                    "
-                />
-
-                {/* Dark Overlay */}
+                {/* Thumbnail */}
 
                 <div
                     className="
-                        absolute
-                        inset-0
-                        bg-black/20
-                        transition
-                        group-hover:bg-black/35
-                    "
-                />
-
-                {/* Play Icon */}
-
-                <div
-                    className="
-                        absolute
-                        inset-0
-                        flex
-                        items-center
-                        justify-center
-                        opacity-0
-                        transition-all
-                        duration-300
-                        group-hover:opacity-100
+                        relative
+                        aspect-video
+                        overflow-hidden
+                        bg-zinc-900
                     "
                 >
+
+                    <img
+                        src={
+                            playlist.thumbnail ||
+                            "https://placehold.co/1280x720/18181b/ffffff?text=Playlist"
+                        }
+                        alt={playlist.name}
+                        draggable={false}
+                        onError={(e) => {
+                            e.currentTarget.src =
+                                "https://placehold.co/1280x720/18181b/ffffff?text=Playlist";
+                        }}
+                        className="
+                            h-full
+                            w-full
+                            object-cover
+                            transition-transform
+                            duration-500
+                            group-hover:scale-105
+                        "
+                    />
+
+                    {/* Overlay */}
+
                     <div
                         className="
-                            rounded-full
-                            bg-black/70
-                            p-4
-                            backdrop-blur
+                            absolute
+                            inset-0
+                            bg-black/20
+                            transition
+                            group-hover:bg-black/35
+                        "
+                    />
+
+                    {/* Play Icon */}
+
+                    <div
+                        className="
+                            absolute
+                            inset-0
+                            flex
+                            items-center
+                            justify-center
+                            opacity-0
+                            transition-all
+                            duration-300
+                            group-hover:opacity-100
                         "
                     >
-                        <Play
-                            size={28}
-                            fill="white"
-                            className="text-white"
-                        />
+                        <div
+                            className="
+                                rounded-full
+                                bg-black/70
+                                p-4
+                                backdrop-blur
+                            "
+                        >
+                            <Play
+                                size={28}
+                                fill="white"
+                                className="text-white"
+                            />
+                        </div>
                     </div>
+
+                    {/* Video Count */}
+
+                    <div
+                        className="
+                            absolute
+                            bottom-3
+                            right-3
+                            flex
+                            items-center
+                            gap-1.5
+                            rounded-lg
+                            bg-black/80
+                            px-2.5
+                            py-1.5
+                            text-xs
+                            font-medium
+                            text-white
+                        "
+                    >
+                        <ListVideo size={14} />
+
+                        {playlist.totalVideos || 0}
+                    </div>
+
                 </div>
 
-                {/* Video Count */}
+                {/* Details */}
 
-                <div
-                    className="
-                        absolute
-                        bottom-3
-                        right-3
-                        flex
-                        items-center
-                        gap-1
-                        rounded-lg
-                        bg-black/80
-                        px-2
-                        py-1
-                        text-xs
-                        text-white
-                    "
-                >
-                    <ListVideo size={14} />
+                <div className="space-y-2.5 p-5">
 
-                    {playlist.totalVideos}
+                    {/* Title */}
+
+                    <h2
+                        className="
+                            line-clamp-1
+                            pr-8
+                            text-lg
+                            font-semibold
+                            leading-6
+                            text-white
+                        "
+                    >
+                        {playlist.name}
+                    </h2>
+
+                    {/* Description */}
+
+                    {playlist.description && (
+                        <p
+                            className="
+                                line-clamp-2
+                                text-sm
+                                leading-5
+                                text-zinc-400
+                            "
+                        >
+                            {playlist.description}
+                        </p>
+                    )}
+
+                    {/* Metadata */}
+
+                    <div
+                        className="
+                            pt-1
+                            text-sm
+                            text-zinc-500
+                        "
+                    >
+                        {playlist.totalVideos || 0} videos
+                        {" • "}
+                        Updated {timeAgo(playlist.updatedAt)}
+                    </div>
+
                 </div>
 
-            </div>
+            </Link>
 
-            {/* Details */}
-
-            <div className="space-y-2 p-5">
-
-                <h2
-                    className="
-                        line-clamp-1
-                        text-lg
-                        font-semibold
-                        text-white
-                    "
-                >
-                    {playlist.name}
-                </h2>
-
-                <p
-                    className="
-                        line-clamp-2
-                        text-sm
-                        text-zinc-400
-                    "
-                >
-                    {playlist.description}
-                </p>
-
-                <div
-                    className="
-                        pt-2
-                        text-sm
-                        text-zinc-500
-                    "
-                >
-                    {playlist.totalVideos} videos • Updated{" "}
-                    {timeAgo(playlist.updatedAt)}
-                </div>
-
-            </div>
-
-        </Link>
+        </div>
     );
 }
 
