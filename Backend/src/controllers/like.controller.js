@@ -111,7 +111,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     const { tweetId } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(tweetId)) {
-        throw new apiError(400, "Invalid comment Id")
+        throw new apiError(400, "Invalid tweet Id")
     }
 
     const tweet = await Tweet.findById(tweetId)
