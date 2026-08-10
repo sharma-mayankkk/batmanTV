@@ -12,3 +12,11 @@ export const getLikedVideos = async (page = 1, limit = 10) => {
 
     return response.data.data;
 };
+
+export const toggleTweetLike = async (tweetId) => {
+    const response = await api.post(
+        `/likes/toggle/tweet/${tweetId}`
+    );
+
+    return response.data.data;
+};
