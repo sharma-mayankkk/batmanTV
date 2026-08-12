@@ -164,10 +164,9 @@ function DashboardVideoRow({
                             py-0.5
                             text-[11px]
                             font-medium
-                            ${
-                                isPublished
-                                    ? "bg-emerald-500/10 text-emerald-400"
-                                    : "bg-zinc-800 text-zinc-400"
+                            ${isPublished
+                                ? "bg-emerald-500/10 text-emerald-400"
+                                : "bg-zinc-800 text-zinc-400"
                             }
                         `}
                     >
@@ -176,10 +175,9 @@ function DashboardVideoRow({
                                 h-1.5
                                 w-1.5
                                 rounded-full
-                                ${
-                                    isPublished
-                                        ? "bg-emerald-400"
-                                        : "bg-zinc-500"
+                                ${isPublished
+                                    ? "bg-emerald-400"
+                                    : "bg-zinc-500"
                                 }
                             `}
                         />

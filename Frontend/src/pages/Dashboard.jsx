@@ -98,9 +98,9 @@ function Dashboard() {
                 prev.map((video) =>
                     video._id === editingVideo._id
                         ? {
-                              ...video,
-                              ...updatedVideo,
-                          }
+                            ...video,
+                            ...updatedVideo,
+                        }
                         : video
                 )
             );
@@ -179,10 +179,10 @@ function Dashboard() {
                 prev.map((item) =>
                     item._id === video._id
                         ? {
-                              ...item,
-                              isPublished:
-                                  updatedVideo.isPublished,
-                          }
+                            ...item,
+                            isPublished:
+                                updatedVideo.isPublished,
+                        }
                         : item
                 )
             );
