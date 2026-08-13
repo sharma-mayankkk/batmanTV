@@ -1,25 +1,41 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Send } from "lucide-react";
+import {
+    Send,
+    Sparkles,
+} from "lucide-react";
+
+import { motion } from "framer-motion";
 
 import { createTweet } from "../../api/tweet";
 
-function TweetComposer({ onTweetCreated }) {
+function TweetComposer({
+    onTweetCreated,
+}) {
     const user = useSelector(
         (state) => state.auth.user
     );
 
-    const [content, setContent] = useState("");
-    const [posting, setPosting] = useState(false);
+    const [content, setContent] =
+        useState("");
+
+    const [posting, setPosting] =
+        useState(false);
 
     const MAX_LENGTH = 280;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const trimmedContent = content.trim();
+        const trimmedContent =
+            content.trim();
 
-        if (!trimmedContent || posting) return;
+        if (
+            !trimmedContent ||
+            posting
+        ) {
+            return;
+        }
 
         try {
             setPosting(true);
@@ -31,7 +47,9 @@ function TweetComposer({ onTweetCreated }) {
 
             setContent("");
 
-            onTweetCreated?.(newTweet);
+            onTweetCreated?.(
+                newTweet
+            );
         } catch (error) {
             console.error(
                 "Failed to create tweet:",
@@ -43,16 +61,52 @@ function TweetComposer({ onTweetCreated }) {
     };
 
     return (
-        <form
+        <motion.form
+            initial={{
+                opacity: 0,
+                y: -8,
+            }}
+            animate={{
+                opacity: 1,
+                y: 0,
+            }}
+            transition={{
+                duration: 0.35,
+            }}
             onSubmit={handleSubmit}
             className="
+                relative
+                overflow-hidden
                 border-b
-                border-zinc-800/60
-                px-5
-                py-5
+                border-zinc-800/70
+                bg-linear-to-br
+                from-zinc-900/70
+                via-[#111111]
+                to-[#0d0d0d]
+                px-6
+                py-6
             "
         >
-            <div className="flex gap-3.5">
+
+            {/* Decorative glow */}
+
+            <div
+                className="
+                    pointer-events-none
+                    absolute
+                    -right-16
+                    -top-20
+                    h-48
+                    w-48
+                    rounded-full
+                    bg-red-600/10
+                    blur-3xl
+                "
+            />
+
+            <div className="relative flex gap-4">
+
+                {/* Avatar */}
 
                 <img
                     src={
@@ -64,17 +118,42 @@ function TweetComposer({ onTweetCreated }) {
                         "User"
                     }
                     className="
-                        h-10
-                        w-10
+                        h-11
+                        w-11
                         shrink-0
                         rounded-full
                         object-cover
-                        ring-1
-                        ring-white/10
+                        ring-2
+                        ring-zinc-800
                     "
                 />
 
                 <div className="min-w-0 flex-1">
+
+                    {/* Label */}
+
+                    <div className="mb-3 flex items-center gap-2">
+
+                        <Sparkles
+                            size={15}
+                            className="text-red-500"
+                        />
+
+                        <span
+                            className="
+                                text-xs
+                                font-medium
+                                uppercase
+                                tracking-widest
+                                text-zinc-500
+                            "
+                        >
+                            Share something
+                        </span>
+
+                    </div>
+
+                    {/* Input */}
 
                     <textarea
                         value={content}
@@ -89,43 +168,58 @@ function TweetComposer({ onTweetCreated }) {
                                 );
                             }
                         }}
-                        placeholder="What's happening?"
+                        placeholder="What's on your mind?"
                         rows={3}
                         className="
                             w-full
                             resize-none
                             bg-transparent
                             text-[16px]
-                            leading-6
+                            leading-7
                             text-zinc-100
                             outline-none
                             placeholder:text-zinc-600
                         "
                     />
 
+                    {/* Footer */}
+
                     <div
                         className="
-                            mt-3
+                            mt-4
                             flex
                             items-center
                             justify-between
                             border-t
-                            border-zinc-800/60
-                            pt-3
+                            border-zinc-800/70
+                            pt-4
                         "
                     >
+
                         <span
-                            className={
-                                content.length > 250
-                                    ? "text-xs text-red-400"
-                                    : "text-xs text-zinc-600"
-                            }
+                            className={`
+                                text-xs
+                                ${content.length >
+                                    250
+                                    ? "text-red-400"
+                                    : "text-zinc-600"
+                                }
+                            `}
                         >
                             {content.length}/
                             {MAX_LENGTH}
                         </span>
 
-                        <button
+                        <motion.button
+                            whileHover={{
+                                scale:
+                                    content.trim()
+                                        ? 1.03
+                                        : 1,
+                            }}
+                            whileTap={{
+                                scale: 0.95,
+                            }}
                             type="submit"
                             disabled={
                                 !content.trim() ||
@@ -138,18 +232,17 @@ function TweetComposer({ onTweetCreated }) {
                                 rounded-full
                                 bg-white
                                 px-5
-                                py-2
+                                py-2.5
                                 text-sm
                                 font-semibold
                                 text-black
-                                shadow-sm
+                                shadow-lg
+                                shadow-black/20
                                 transition-all
                                 duration-200
                                 hover:bg-zinc-200
-                                hover:shadow-md
-                                active:scale-95
                                 disabled:cursor-not-allowed
-                                disabled:opacity-40
+                                disabled:opacity-35
                             "
                         >
                             <Send size={15} />
@@ -157,12 +250,14 @@ function TweetComposer({ onTweetCreated }) {
                             {posting
                                 ? "Posting..."
                                 : "Post"}
-                        </button>
+                        </motion.button>
+
                     </div>
 
                 </div>
+
             </div>
-        </form>
+        </motion.form>
     );
 }
 

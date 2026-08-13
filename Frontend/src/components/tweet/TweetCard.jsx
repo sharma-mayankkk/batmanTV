@@ -8,7 +8,10 @@ import {
     MoreHorizontal,
     Pencil,
     Trash2,
+    Sparkles,
 } from "lucide-react";
+
+import { motion } from "framer-motion";
 
 import { timeAgo } from "../../utils/timeAgo";
 import { toggleTweetLike } from "../../api/like";
@@ -37,9 +40,7 @@ function TweetCard({
 
         try {
             const response =
-                await toggleTweetLike(
-                    tweet._id
-                );
+                await toggleTweetLike(tweet._id);
 
             setLiked(response.isLiked);
 
@@ -57,24 +58,64 @@ function TweetCard({
     };
 
     return (
-        <article
+        <motion.article
+            initial={{
+                opacity: 0,
+                y: 12,
+            }}
+            animate={{
+                opacity: 1,
+                y: 0,
+            }}
+            transition={{
+                duration: 0.35,
+                ease: "easeOut",
+            }}
+            whileHover={{
+                backgroundColor:
+                    "rgba(255,255,255,0.018)",
+            }}
             className="
                 group
+                relative
                 border-b
-                border-zinc-800/60
-                px-5
-                py-5
+                border-zinc-800/70
+                px-6
+                py-6
                 transition-colors
                 duration-200
-                hover:bg-white/1.5
             "
         >
-            <div className="flex gap-3.5">
+            {/* Subtle left accent */}
+
+            <div
+                className="
+                    absolute
+                    left-0
+                    top-6
+                    h-10
+                    w-0.5
+                    rounded-r-full
+                    bg-transparent
+                    transition-all
+                    duration-300
+                    group-hover:bg-red-500/70
+                "
+            />
+
+            <div className="flex gap-4">
 
                 {/* Avatar */}
 
-                <div className="shrink-0">
-
+                <motion.div
+                    whileHover={{
+                        scale: 1.05,
+                    }}
+                    transition={{
+                        duration: 0.2,
+                    }}
+                    className="shrink-0"
+                >
                     <img
                         src={
                             tweet.owner?.avatar ||
@@ -89,96 +130,98 @@ function TweetCard({
                                 "https://ui-avatars.com/api/?name=User&background=27272a&color=fff";
                         }}
                         className="
-                            h-10
-                            w-10
+                            h-11
+                            w-11
                             rounded-full
                             object-cover
-                            ring-1
-                            ring-white/10
+                            ring-2
+                            ring-zinc-800
+                            transition-all
+                            duration-300
+                            group-hover:ring-zinc-700
                         "
                     />
+                </motion.div>
 
-                </div>
-
-                {/* Content */}
+                {/* Main content */}
 
                 <div className="min-w-0 flex-1">
 
                     {/* Header */}
 
-                    <div className="flex items-start">
+                    <div className="flex items-start gap-3">
 
-                        <div
-                            className="
-                                flex
-                                min-w-0
-                                items-center
-                                gap-1.5
-                            "
-                        >
-                            <span
-                                className="
-                                    max-w-45
-                                    truncate
-                                    text-[15px]
-                                    font-semibold
-                                    tracking-[-0.01em]
-                                    text-white
-                                "
-                            >
-                                {tweet.owner?.fullName}
-                            </span>
+                        <div className="min-w-0">
 
-                            <span
-                                className="
-                                    max-w-32.5
-                                    truncate
-                                    text-[14px]
-                                    text-zinc-500
-                                "
-                            >
-                                @{tweet.owner?.username}
-                            </span>
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
 
-                            <span className="text-zinc-700">
-                                ·
-                            </span>
+                                <span
+                                    className="
+                                        max-w-52
+                                        truncate
+                                        text-[15px]
+                                        font-semibold
+                                        text-white
+                                    "
+                                >
+                                    {tweet.owner?.fullName}
+                                </span>
 
-                            <span
-                                className="
-                                    shrink-0
-                                    text-[13px]
-                                    text-zinc-500
-                                "
-                            >
-                                {timeAgo(
-                                    tweet.createdAt
-                                )}
-                            </span>
+                                <span
+                                    className="
+                                        max-w-40
+                                        truncate
+                                        text-[14px]
+                                        text-zinc-500
+                                    "
+                                >
+                                    @{tweet.owner?.username}
+                                </span>
+
+                                <span className="text-zinc-700">
+                                    ·
+                                </span>
+
+                                <span
+                                    className="
+                                        text-[13px]
+                                        text-zinc-500
+                                    "
+                                >
+                                    {timeAgo(
+                                        tweet.createdAt
+                                    )}
+                                </span>
+
+                            </div>
+
                         </div>
 
-                        {/* Owner Menu */}
+                        {/* Owner menu */}
 
                         {isOwner && (
                             <div className="ml-auto shrink-0">
 
                                 <DropdownMenu
                                     trigger={
-                                        <div
+                                        <motion.div
+                                            whileTap={{
+                                                scale: 0.9,
+                                            }}
                                             className="
                                                 rounded-full
-                                                p-1.5
+                                                p-2
                                                 text-zinc-600
-                                                transition
+                                                transition-all
                                                 duration-200
                                                 hover:bg-zinc-800
-                                                hover:text-zinc-300
+                                                hover:text-zinc-200
                                             "
                                         >
                                             <MoreHorizontal
                                                 size={18}
                                             />
-                                        </div>
+                                        </motion.div>
                                     }
                                     items={[
                                         {
@@ -206,15 +249,15 @@ function TweetCard({
 
                     </div>
 
-                    {/* Tweet */}
+                    {/* Content */}
 
                     <p
                         className="
-                            mt-2
+                            mt-3
                             whitespace-pre-wrap
                             wrap-break-word
                             text-[15px]
-                            leading-[1.65]
+                            leading-7
                             text-zinc-200
                         "
                     >
@@ -225,9 +268,9 @@ function TweetCard({
 
                     <div
                         className="
-                            mt-4
+                            mt-5
                             flex
-                            max-w-105
+                            max-w-md
                             items-center
                             justify-between
                         "
@@ -235,16 +278,20 @@ function TweetCard({
 
                         {/* Reply */}
 
-                        <button
+                        <motion.button
+                            whileTap={{
+                                scale: 0.92,
+                            }}
                             type="button"
                             className="
+                                group/action
                                 flex
                                 items-center
-                                gap-1.5
+                                gap-2
                                 rounded-full
-                                px-2
-                                py-1.5
-                                text-zinc-600
+                                px-3
+                                py-2
+                                text-zinc-500
                                 transition-all
                                 duration-200
                                 hover:bg-blue-500/10
@@ -259,58 +306,82 @@ function TweetCard({
                             <span className="text-xs">
                                 Reply
                             </span>
-                        </button>
+                        </motion.button>
 
                         {/* Like */}
 
-                        <button
+                        <motion.button
+                            whileTap={{
+                                scale: 0.88,
+                            }}
                             type="button"
                             onClick={handleLike}
                             className={`
                                 flex
                                 items-center
-                                gap-1.5
+                                gap-2
                                 rounded-full
-                                px-2
-                                py-1.5
+                                px-3
+                                py-2
                                 transition-all
                                 duration-200
-                                ${
-                                    liked
-                                        ? "text-red-500 hover:bg-red-500/10"
-                                        : "text-zinc-600 hover:bg-red-500/10 hover:text-red-400"
+                                ${liked
+                                    ? "bg-red-500/10 text-red-500"
+                                    : "text-zinc-500 hover:bg-red-500/10 hover:text-red-400"
                                 }
                             `}
                         >
-                            <Heart
-                                size={18}
-                                strokeWidth={1.8}
-                                fill={
+                            <motion.div
+                                animate={
                                     liked
-                                        ? "currentColor"
-                                        : "none"
+                                        ? {
+                                            scale: [
+                                                1,
+                                                1.3,
+                                                1,
+                                            ],
+                                        }
+                                        : {
+                                            scale: 1,
+                                        }
                                 }
-                            />
+                                transition={{
+                                    duration: 0.25,
+                                }}
+                            >
+                                <Heart
+                                    size={18}
+                                    strokeWidth={1.8}
+                                    fill={
+                                        liked
+                                            ? "currentColor"
+                                            : "none"
+                                    }
+                                />
+                            </motion.div>
 
                             {likes > 0 && (
                                 <span className="text-xs">
                                     {likes}
                                 </span>
                             )}
-                        </button>
+                        </motion.button>
 
                         {/* Share */}
 
-                        <button
+                        <motion.button
+                            whileTap={{
+                                scale: 0.92,
+                            }}
                             type="button"
                             className="
                                 flex
                                 items-center
-                                gap-1.5
+                                gap-2
                                 rounded-full
-                                px-2
-                                py-1.5
-                                text-zinc-600
+                                px-3
+                                py-2
+                                text-zinc-500
                                 transition-all
                                 duration-200
                                 hover:bg-emerald-500/10
@@ -325,14 +396,14 @@ function TweetCard({
                             <span className="text-xs">
                                 Share
                             </span>
-                        </button>
+                        </motion.button>
 
                     </div>
 
                 </div>
 
             </div>
-        </article>
+        </motion.article>
     );
 }
 
