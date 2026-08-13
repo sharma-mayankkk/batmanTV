@@ -52,9 +52,7 @@ function Sidebar({ isSidebarOpen }) {
     <motion.aside
       initial={false}
       animate={{
-        width: isSidebarOpen
-          ? 256
-          : 80,
+        width: isSidebarOpen ? 256 : 80,
       }}
       transition={{
         type: "spring",
@@ -62,33 +60,29 @@ function Sidebar({ isSidebarOpen }) {
         damping: 30,
       }}
       className="
-                fixed
-                left-0
-                top-16
-                z-30
-                h-[calc(100vh-64px)]
-                overflow-y-auto
-                overflow-x-visible
-                bg-[#0f0f0f]
-                py-4
-                scrollbar-hide
-            "
+        fixed
+        left-0
+        top-16
+        z-30
+        h-[calc(100vh-64px)]
+        overflow-y-auto
+        overflow-x-visible
+        bg-[#0f0f0f]
+        py-4
+        scrollbar-hide
+      "
     >
-
       <nav className="flex flex-col gap-1 px-3">
 
         {navItems.map((item) => {
-
           const Icon = item.icon;
 
           return (
-
             <NavLink
               key={item.path}
               to={item.path}
             >
               {({ isActive }) => (
-
                 <motion.div
                   initial={false}
                   whileHover={{
@@ -103,22 +97,24 @@ function Sidebar({ isSidebarOpen }) {
                     damping: 25,
                   }}
                   className={`
-                      group
-                      relative
-                      flex
-                      h-11
-                      cursor-pointer
-                      select-none
-                      items-center
-                      rounded-xl
-                      px-4
-                      ${isSidebarOpen
-                      ? "gap-5"
-                      : "justify-center"
+                    group
+                    relative
+                    flex
+                    h-11
+                    cursor-pointer
+                    select-none
+                    items-center
+                    rounded-xl
+                    px-4
+                    ${
+                      isSidebarOpen
+                        ? "gap-5"
+                        : "justify-center"
                     }
-                      ${isActive
-                      ? "bg-[#272727] font-semibold text-white"
-                      : "text-zinc-300 hover:bg-[#272727] hover:text-white"
+                    ${
+                      isActive
+                        ? "bg-[#272727] font-semibold text-white"
+                        : "text-zinc-300 hover:bg-[#272727] hover:text-white"
                     }
                   `}
                 >
@@ -127,7 +123,6 @@ function Sidebar({ isSidebarOpen }) {
 
                   <AnimatePresence>
                     {isActive && (
-
                       <motion.span
                         initial={{
                           opacity: 0,
@@ -145,16 +140,15 @@ function Sidebar({ isSidebarOpen }) {
                           duration: 0.2,
                         }}
                         className="
-                              absolute
-                              left-0
-                              h-6
-                              w-1
-                              origin-center
-                              rounded-r-full
-                              bg-white
-                          "
+                          absolute
+                          left-0
+                          h-6
+                          w-1
+                          origin-center
+                          rounded-r-full
+                          bg-white
+                        "
                       />
-
                     )}
                   </AnimatePresence>
 
@@ -162,9 +156,7 @@ function Sidebar({ isSidebarOpen }) {
 
                   <motion.div
                     animate={{
-                      scale: isActive
-                        ? 1.1
-                        : 1,
+                      scale: isActive ? 1.1 : 1,
                     }}
                     transition={{
                       type: "spring",
@@ -182,9 +174,7 @@ function Sidebar({ isSidebarOpen }) {
                   {/* LABEL */}
 
                   <AnimatePresence initial={false}>
-
                     {isSidebarOpen && (
-
                       <motion.span
                         initial={{
                           opacity: 0,
@@ -205,25 +195,21 @@ function Sidebar({ isSidebarOpen }) {
                           duration: 0.2,
                         }}
                         className="
-                            overflow-hidden
-                            whitespace-nowrap
-                            text-[15px]
-                            tracking-wide
+                          overflow-hidden
+                          whitespace-nowrap
+                          text-[15px]
+                          tracking-wide
                         "
                       >
                         {item.name}
                       </motion.span>
-
                     )}
-
                   </AnimatePresence>
 
                   {/* COLLAPSED TOOLTIP */}
 
                   <AnimatePresence>
-
                     {!isSidebarOpen && (
-
                       <motion.div
                         initial={{
                           opacity: 0,
@@ -234,36 +220,68 @@ function Sidebar({ isSidebarOpen }) {
                           x: 5,
                         }}
                         className="
-                              pointer-events-none
-                              absolute
-                              left-16
-                              z-50
-                              whitespace-nowrap
-                              rounded-md
-                              bg-[#272727]
-                              px-3
-                              py-2
-                              text-sm
-                              text-white
-                              shadow-lg
-                          "
+                          pointer-events-none
+                          absolute
+                          left-16
+                          z-50
+                          whitespace-nowrap
+                          rounded-md
+                          bg-[#272727]
+                          px-3
+                          py-2
+                          text-sm
+                          text-white
+                          shadow-lg
+                        "
                       >
                         {item.name}
                       </motion.div>
-
                     )}
-
                   </AnimatePresence>
 
                 </motion.div>
-
               )}
             </NavLink>
-
           );
         })}
-
       </nav>
+
+      {/* COPYRIGHT */}
+
+      <AnimatePresence initial={false}>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 8,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              y: 8,
+            }}
+            transition={{
+              duration: 0.25,
+              ease: "easeOut",
+            }}
+            className="
+              absolute
+              bottom-4
+              left-0
+              right-0
+              text-center
+              pointer-events-none
+            "
+          >
+            <span className="text-xs text-zinc-600">
+              © Sharma28
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </motion.aside>
   );
