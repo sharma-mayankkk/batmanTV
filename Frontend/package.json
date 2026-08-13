@@ -15,6 +15,7 @@
     "axios": "^1.18.1",
     "cropperjs": "^1.6.2",
     "date-fns": "^4.4.0",
+    "framer-motion": "^13.1.0",
     "lucide-react": "^1.23.0",
     "plyr": "^3.8.4",
     "plyr-react": "^6.0.0",
