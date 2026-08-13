@@ -1,13 +1,13 @@
 import { Search, Upload, Bell, Menu } from "lucide-react";
-import logo from "../../assets/batlogo.png"; // Change path if needed
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import logo from "../../assets/batlogo.png";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { useState, useRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 import { logout } from "../../store/slices/authSlice";
 import { logoutUser } from "../../api/auth";
+
+import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar({
     isSidebarOpen,
@@ -18,33 +18,33 @@ function Navbar({
     );
 
     const [showMenu, setShowMenu] = useState(false);
+
     const menuRef = useRef(null);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const iconButtonClass = `
-                        w-10
-                        h-10
-                        rounded-full
-                        flex
-                        items-center
-                        justify-center
-                        transition-all
-                        duration-200
-                        hover:bg-[#272727]
-                        hover:scale-105
-                        active:scale-95
-                        `;
+        flex
+        h-10
+        w-10
+        items-center
+        justify-center
+        rounded-full
+        transition-colors
+        duration-200
+        hover:bg-[#272727]
+    `;
 
     const menuItemClass = `
-                        w-full
-                        px-4
-                        py-3
-                        text-left
-                        transition-all
-                        duration-200
-                        hover:bg-zinc-800
-                `;
+        w-full
+        px-4
+        py-3
+        text-left
+        transition-colors
+        duration-200
+        hover:bg-zinc-800
+    `;
 
     const handleLogout = async () => {
         try {
@@ -62,7 +62,10 @@ function Navbar({
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target)
+            ) {
                 setShowMenu(false);
             }
         };
@@ -73,60 +76,115 @@ function Navbar({
             }
         };
 
-        document.addEventListener("mousedown", handleClickOutside);
-        document.addEventListener("keydown", handleEscape);
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        );
+
+        document.addEventListener(
+            "keydown",
+            handleEscape
+        );
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            document.removeEventListener("keydown", handleEscape);
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+
+            document.removeEventListener(
+                "keydown",
+                handleEscape
+            );
         };
     }, []);
 
-
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-[#0f0f0f] border-b border-zinc-800">
-
-            <div className="grid grid-cols-[260px_1fr_220px] items-center h-full px-5">
+        <header
+            className="
+                fixed
+                left-0
+                right-0
+                top-0
+                z-50
+                h-16
+                border-b
+                border-zinc-800
+                bg-[#0f0f0f]
+            "
+        >
+            <div
+                className="
+                    grid
+                    h-full
+                    grid-cols-[260px_1fr_220px]
+                    items-center
+                    px-5
+                "
+            >
 
                 {/* LEFT */}
 
                 <div className="flex items-center gap-3">
 
-                    <button
-                        onClick={() => setIsSidebarOpen((prev) => !prev)}
-                        className="
-                            w-10
-                            h-10
-                            rounded-full
-                            flex
-                            items-center
-                            justify-center
-                            transition-all
-                            duration-200
-                            hover:bg-[#272727]
-                            hover:scale-105
-                            active:scale-95
-                        "
+                    <motion.button
+                        onClick={() =>
+                            setIsSidebarOpen(
+                                (prev) => !prev
+                            )
+                        }
+                        whileHover={{
+                            scale: 1.08,
+                        }}
+                        whileTap={{
+                            scale: 0.9,
+                        }}
+                        transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 20,
+                        }}
+                        className={iconButtonClass}
                     >
-                        <Menu size={22} />
-                    </button>
+                        <motion.div
+                            animate={{
+                                rotate: isSidebarOpen
+                                    ? 0
+                                    : 180,
+                            }}
+                            transition={{
+                                duration: 0.25,
+                            }}
+                        >
+                            <Menu size={22} />
+                        </motion.div>
+                    </motion.button>
 
                     <Link to="/">
-                        <img
+
+                        <motion.img
                             src={logo}
                             alt="BatmanTV"
+                            draggable={false}
+                            whileHover={{
+                                scale: 1.05,
+                            }}
+                            whileTap={{
+                                scale: 0.95,
+                            }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 20,
+                            }}
                             className="
                                 h-10
-                                object-contain
                                 cursor-pointer
                                 select-none
-                                transition-all
-                                duration-300
-                                hover:scale-105
-                                hover:opacity-90
-                                active:scale-95
+                                object-contain
                             "
                         />
+
                     </Link>
 
                 </div>
@@ -142,18 +200,18 @@ function Navbar({
                             placeholder="Search"
                             className="
                                 peer
-                                flex-1
                                 h-10
-                                bg-[#121212]
+                                flex-1
+                                rounded-l-full
                                 border
                                 border-zinc-700
-                                rounded-l-full
+                                bg-[#121212]
                                 pl-6
                                 pr-4
                                 text-[15px]
                                 text-white
-                                placeholder:text-zinc-500
                                 outline-none
+                                placeholder:text-zinc-500
                                 transition-all
                                 duration-200
                                 focus:border-blue-500
@@ -162,28 +220,30 @@ function Navbar({
                             "
                         />
 
-                        <button
+                        <motion.button
+                            whileTap={{
+                                scale: 0.95,
+                            }}
                             className="
-                                w-16
-                                h-10
-                                bg-[#222222]
-                                border
-                                border-zinc-700
-                                border-l-0
-                                rounded-r-full
                                 flex
+                                h-10
+                                w-16
                                 items-center
                                 justify-center
-                                transition-all
+                                rounded-r-full
+                                border
+                                border-l-0
+                                border-zinc-700
+                                bg-[#222222]
+                                transition-colors
                                 duration-200
                                 hover:bg-[#303030]
                                 peer-focus:border-blue-500
                                 peer-focus:text-blue-400
-                                active:scale-95
                             "
                         >
                             <Search size={22} />
-                        </button>
+                        </motion.button>
 
                     </div>
 
@@ -191,129 +251,237 @@ function Navbar({
 
                 {/* RIGHT */}
 
-                <div className="flex justify-end items-center gap-3">
-                    <button
-                        onClick={() => navigate("/upload")}
+                <div className="flex items-center justify-end gap-3">
+
+                    {/* Upload */}
+
+                    <motion.button
+                        onClick={() =>
+                            navigate("/upload")
+                        }
+                        whileHover={{
+                            scale: 1.08,
+                        }}
+                        whileTap={{
+                            scale: 0.9,
+                        }}
+                        transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 20,
+                        }}
                         className={iconButtonClass}
                     >
                         <Upload size={22} />
-                    </button>
+                    </motion.button>
 
-                    <button className={iconButtonClass}>
+                    {/* Notification */}
+
+                    <motion.button
+                        whileHover={{
+                            scale: 1.08,
+                        }}
+                        whileTap={{
+                            scale: 0.9,
+                        }}
+                        transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 20,
+                        }}
+                        className={iconButtonClass}
+                    >
                         <Bell size={22} />
-                    </button>
+                    </motion.button>
+
+                    {/* USER */}
 
                     {isAuthenticated ? (
-                        <div className="relative" ref={menuRef}>
 
-                            <img
+                        <div
+                            className="relative"
+                            ref={menuRef}
+                        >
+
+                            <motion.img
                                 src={user.avatar}
                                 alt={user.fullName}
-                                onClick={() => setShowMenu((prev) => !prev)}
+                                onClick={() =>
+                                    setShowMenu(
+                                        (prev) => !prev
+                                    )
+                                }
+                                whileHover={{
+                                    scale: 1.08,
+                                }}
+                                whileTap={{
+                                    scale: 0.92,
+                                }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 400,
+                                    damping: 20,
+                                }}
                                 className="
-                                    w-9
                                     h-9
+                                    w-9
+                                    cursor-pointer
+                                    select-none
                                     rounded-full
                                     object-cover
-                                    cursor-pointer
-                                    transition-all
-                                    duration-200
-                                    hover:scale-105
-                                    hover:ring-2
-                                    hover:ring-zinc-400
                                     ring-offset-2
                                     ring-offset-[#0f0f0f]
-                                    active:scale-95
-                                    select-none
+                                    hover:ring-2
+                                    hover:ring-zinc-400
                                 "
                             />
 
-                            {showMenu && (
-                                <div
-                                    className="
-                                        absolute
-                                        right-0
-                                        mt-3
-                                        w-72
-                                        overflow-hidden
-                                        rounded-xl
-                                        border
-                                        border-zinc-800
-                                        bg-[#212121]
-                                        shadow-[0_12px_40px_rgba(0,0,0,0.45)]
-                                        transition-all
-                                        duration-200
-                                    "
-                                >
+                            <AnimatePresence>
+                                {showMenu && (
 
-                                    <div className="flex items-center gap-3 p-4 border-b border-zinc-800">
+                                    <motion.div
+                                        initial={{
+                                            opacity: 0,
+                                            y: -8,
+                                            scale: 0.96,
+                                        }}
+                                        animate={{
+                                            opacity: 1,
+                                            y: 0,
+                                            scale: 1,
+                                        }}
+                                        exit={{
+                                            opacity: 0,
+                                            y: -8,
+                                            scale: 0.96,
+                                        }}
+                                        transition={{
+                                            duration: 0.18,
+                                            ease: "easeOut",
+                                        }}
+                                        className="
+                                            absolute
+                                            right-0
+                                            mt-3
+                                            w-72
+                                            origin-top-right
+                                            overflow-hidden
+                                            rounded-xl
+                                            border
+                                            border-zinc-800
+                                            bg-[#212121]
+                                            shadow-[0_12px_40px_rgba(0,0,0,0.45)]
+                                        "
+                                    >
 
-                                        <img
-                                            src={user.avatar}
-                                            alt={user.fullName}
-                                            className="w-11 h-11 rounded-full object-cover"
-                                        />
+                                        {/* USER INFO */}
 
-                                        <div className="min-w-0">
-                                            <h3 className="text-[15px] font-semibold text-white">
-                                                {user.fullName}
-                                            </h3>
+                                        <div
+                                            className="
+                                                flex
+                                                items-center
+                                                gap-3
+                                                border-b
+                                                border-zinc-800
+                                                p-4
+                                            "
+                                        >
 
-                                            <p className="text-[13px] text-zinc-400 truncate">
-                                                {user.email}
-                                            </p>
+                                            <img
+                                                src={user.avatar}
+                                                alt={user.fullName}
+                                                className="
+                                                    h-11
+                                                    w-11
+                                                    rounded-full
+                                                    object-cover
+                                                "
+                                            />
+
+                                            <div className="min-w-0">
+
+                                                <h3 className="
+                                                    text-[15px]
+                                                    font-semibold
+                                                    text-white
+                                                ">
+                                                    {user.fullName}
+                                                </h3>
+
+                                                <p className="
+                                                    truncate
+                                                    text-[13px]
+                                                    text-zinc-400
+                                                ">
+                                                    {user.email}
+                                                </p>
+
+                                            </div>
+
                                         </div>
 
-                                    </div>
+                                        {/* PROFILE */}
 
-                                    <Link to="/profile">
+                                        <Link to="/profile">
 
-                                        <button className={`${menuItemClass} text-white`}>
-                                            My Profile
-                                        </button>
+                                            <motion.button
+                                                whileHover={{
+                                                    x: 3,
+                                                }}
+                                                className={`${menuItemClass} text-white`}
+                                            >
+                                                My Profile
+                                            </motion.button>
 
-                                    </Link>
+                                        </Link>
 
-                                    <button
-                                        onClick={handleLogout}
-                                        className={`${menuItemClass} text-red-400`}
-                                    >
-                                        Logout
-                                    </button>
+                                        {/* LOGOUT */}
 
-                                </div>
-                            )}
+                                        <motion.button
+                                            onClick={handleLogout}
+                                            whileHover={{
+                                                x: 3,
+                                            }}
+                                            className={`${menuItemClass} text-red-400`}
+                                        >
+                                            Logout
+                                        </motion.button>
+
+                                    </motion.div>
+
+                                )}
+                            </AnimatePresence>
 
                         </div>
+
                     ) : (
+
                         <Link
                             to="/login"
                             className="
-                                px-5
+                                flex
                                 h-10
+                                items-center
+                                justify-center
                                 rounded-full
                                 border
                                 border-blue-500
-                                text-blue-500
-                                flex
-                                items-center
-                                justify-center
+                                px-5
                                 font-medium
-                                transition-all
+                                text-blue-500
+                                transition-colors
                                 duration-200
                                 hover:bg-blue-500/10
-                                hover:scale-105
-                                active:scale-95
                             "
                         >
                             Sign In
                         </Link>
+
                     )}
 
                 </div>
 
             </div>
-
         </header>
     );
 }

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 import Navbar from "../components/layout/Navbar";
 import Sidebar from "../components/layout/Sidebar";
 
 function MainLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const location = useLocation();
 
     return (
         <div className="min-h-screen bg-black text-white">
@@ -15,7 +17,7 @@ function MainLayout() {
                 setIsSidebarOpen={setIsSidebarOpen}
             />
 
-            <div className="pt-16 flex">
+            <div className="flex pt-16">
                 <Sidebar isSidebarOpen={isSidebarOpen} />
 
                 <main
@@ -25,9 +27,31 @@ function MainLayout() {
                         transition-all
                         duration-300
                         ${isSidebarOpen ? "ml-64" : "ml-20"}
-                        `}
+                    `}
                 >
-                    <Outlet />
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={location.pathname}
+                            initial={{
+                                opacity: 0,
+                                y: 8,
+                            }}
+                            animate={{
+                                opacity: 1,
+                                y: 0,
+                            }}
+                            exit={{
+                                opacity: 0,
+                                y: -4,
+                            }}
+                            transition={{
+                                duration: 0.22,
+                                ease: "easeOut",
+                            }}
+                        >
+                            <Outlet />
+                        </motion.div>
+                    </AnimatePresence>
                 </main>
             </div>
         </div>

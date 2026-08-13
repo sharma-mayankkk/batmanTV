@@ -7,6 +7,7 @@ import { formatDuration } from "../../utils/formatDuration";
 import { useState } from "react";
 import VideoMenu from "./VideoMenu";
 import SaveToPlaylistModal from "../video/SaveToPlaylistModal";
+import { motion } from "framer-motion";
 
 function VideoCard({ video, variant = "grid" }) {
   const isCompact = variant === "compact";
@@ -26,32 +27,40 @@ function VideoCard({ video, variant = "grid" }) {
   const navigate = useNavigate();
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.25,
+        ease: "easeOut",
+      }}
+      whileHover={{
+        y: -2,
+      }}
       className={
         isCompact
           ? `
-                        group
-                        flex
-                        gap-3
-                        rounded-xl
-                        p-2
-                        transition-all
-                        duration-300
-                        hover:bg-zinc-900
-                    `
+                group
+                flex
+                gap-3
+                rounded-xl
+                p-2
+                transition-all
+                duration-300
+                hover:bg-zinc-900
+            `
           : `
-                        group
-                        flex
-                        flex-col
-                        will-change-transform
-                        rounded-2xl
-                        p-2
-                        -m-2
-                        transition-all
-                        duration-300
-                        hover:bg-neutral-900/70
-                        hover:-translate-y-1
-                    `
+                group
+                flex
+                flex-col
+                will-change-transform
+                rounded-2xl
+                p-2
+                -m-2
+                transition-all
+                duration-300
+                hover:bg-neutral-900/70
+            `
       }
     >
       {/* Thumbnail */}
@@ -273,7 +282,7 @@ function VideoCard({ video, variant = "grid" }) {
         onClose={() => setPlaylistModalOpen(false)}
         video={video}
       />
-    </div>
+    </motion.div>
   );
 }
 
