@@ -9,7 +9,7 @@ import { useRef } from "react";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { changePassword } from "../api/user";
 
-import PasswordInput from "../components/profile/PasswordInput";
+import PasswordInput from "../components/Profile/PasswordInput.jsx";
 import { updateAvatar, updateCoverImage } from "../api/user";
 import ImageCropModal from "../components/common/ImageCropModal";
 import getCroppedImg from "../utils/cropImage";
