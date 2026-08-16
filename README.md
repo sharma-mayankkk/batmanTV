@@ -1,4 +1,4 @@
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a6706b5d-0ddd-485c-80c4-5b94ff32a372" /><img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2ec23cbf-246f-49f4-850a-55f1c88a794f" /># 🦇 BatmanTV
+# 🦇 BatmanTV
 
 A full-stack, YouTube-inspired video streaming web application built as a college portfolio project — supporting video uploads, playback, subscriptions, and more.
 
