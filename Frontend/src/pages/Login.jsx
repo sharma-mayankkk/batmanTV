@@ -59,6 +59,29 @@ const Login = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await loginUser({
+        email: "demo@batmantv.com",
+        password: "demo123",
+      });
+
+      dispatch(login(response.user));
+
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "Demo login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-[#181818] p-10">
@@ -160,6 +183,34 @@ const Login = () => {
             "
           >
             {loading ? "Signing In..." : "Sign In"}
+          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-zinc-800" />
+            <span className="text-xs text-zinc-500">OR</span>
+            <div className="h-px flex-1 bg-zinc-800" />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="
+    w-full
+    rounded-xl
+    border
+    border-zinc-700
+    bg-zinc-900
+    py-3.5
+    font-semibold
+    text-white
+    transition
+    hover:bg-zinc-800
+    disabled:cursor-not-allowed
+    disabled:opacity-50
+  "
+          >
+            Continue as Demo User
           </button>
         </form>
 
